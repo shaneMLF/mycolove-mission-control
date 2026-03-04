@@ -1510,9 +1510,16 @@
 
   async function atFetch(table) {
     try {
-      const res = await fetch(`${getUrl()}/${encodeURIComponent(table)}`, { headers: getHeaders() });
-      const data = await res.json();
-      return data.records || [];
+      let allRecords = [];
+      let offset = null;
+      do {
+        const url = `${getUrl()}/${encodeURIComponent(table)}?pageSize=100${offset ? '&offset=' + offset : ''}`;
+        const res = await fetch(url, { headers: getHeaders() });
+        const data = await res.json();
+        if (data.records) allRecords = allRecords.concat(data.records);
+        offset = data.offset || null;
+      } while (offset);
+      return allRecords;
     } catch(e) { console.error('Airtable fetch error:', e); return []; }
   }
 
