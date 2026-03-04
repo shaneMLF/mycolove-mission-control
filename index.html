@@ -680,6 +680,7 @@
     </nav>
 
     <div class="sidebar-footer">
+      <div style="margin-bottom:16px;"><button onclick="resetToken()" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Syne Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:5px 12px;cursor:pointer;width:100%;text-transform:uppercase;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--muted)'" onmouseout="this.style.borderColor='var(--border)'">⚙ Reset Airtable Token</button></div>
       <div class="target-label">60-Day Target</div>
       <div class="target-val">$40K</div>
       <div class="target-sub">D2C + B2B / month</div>
@@ -1118,6 +1119,8 @@
         </div>
       </div>
 
+      <div id="at-tasks" style="margin-bottom:16px;background:var(--surface);border:1px solid var(--border);padding:16px 22px;min-height:40px;"></div>
+
       <div class="progress-bar-section">
         <div>
           <div class="pb-label">Tasks Complete</div>
@@ -1150,81 +1153,8 @@
           <div>Outreach Angle</div>
           <div>Priority</div>
         </div>
+        <div id="at-b2b-pipeline"><div style="padding:20px;color:var(--muted);font-size:11px;">Loading from Airtable...</div></div>
 
-        <div class="pipeline-row">
-          <div>
-            <span class="p-name">Botanical Beverage Brands</span>
-            <span class="p-sub">Already formulating w/ adaptogens</span>
-            <div style="margin-top:6px;">
-              <span class="status-dot s-prospect" onclick="cycleStatus(this)">● Prospect</span>
-            </div>
-          </div>
-          <div><div class="p-deal">$5–50K</div><div class="p-speed">per PO</div></div>
-          <div><div style="font-size:11px;color:var(--dim);">4–8 weeks</div></div>
-          <div><div style="font-size:10px;color:var(--dim);">Liquid extract sample kit + COA + USDA cert</div>
-            <input class="edit-note" placeholder="Add note..." /></div>
-          <div><span class="p-priority pp1">P1 · Close first</span></div>
-        </div>
-
-        <div class="pipeline-row">
-          <div>
-            <span class="p-name">Bulk Extract Buyers</span>
-            <span class="p-sub">Brands white-labeling internally</span>
-            <div style="margin-top:6px;">
-              <span class="status-dot s-prospect" onclick="cycleStatus(this)">● Prospect</span>
-            </div>
-          </div>
-          <div><div class="p-deal">$3–15K</div><div class="p-speed">per PO</div></div>
-          <div><div style="font-size:11px;color:var(--dim);">2–4 weeks</div></div>
-          <div><div style="font-size:10px;color:var(--dim);">Potency data + price per gram + minimum order</div>
-            <input class="edit-note" placeholder="Add note..." /></div>
-          <div><span class="p-priority pp1">P1 · Fastest close</span></div>
-        </div>
-
-        <div class="pipeline-row">
-          <div>
-            <span class="p-name">Private Label Brands</span>
-            <span class="p-sub">Want MycoLove-produced branded product</span>
-            <div style="margin-top:6px;">
-              <span class="status-dot s-prospect" onclick="cycleStatus(this)">● Prospect</span>
-            </div>
-          </div>
-          <div><div class="p-deal">$5–20K</div><div class="p-speed">per batch</div></div>
-          <div><div style="font-size:11px;color:var(--dim);">6–10 weeks</div></div>
-          <div><div style="font-size:10px;color:var(--dim);">Private label deck — your extraction, their brand</div>
-            <input class="edit-note" placeholder="Add note..." /></div>
-          <div><span class="p-priority pp2">P2 · High value</span></div>
-        </div>
-
-        <div class="pipeline-row">
-          <div>
-            <span class="p-name">Apothecaries / Herbal Shops</span>
-            <span class="p-sub">Retail tincture buyers, fast close</span>
-            <div style="margin-top:6px;">
-              <span class="status-dot s-prospect" onclick="cycleStatus(this)">● Prospect</span>
-            </div>
-          </div>
-          <div><div class="p-deal">$500–1.5K</div><div class="p-speed">per order</div></div>
-          <div><div style="font-size:11px;color:var(--dim);">1–2 weeks</div></div>
-          <div><div style="font-size:10px;color:var(--dim);">Wholesale pricing sheet + tincture line overview</div>
-            <input class="edit-note" placeholder="Add note..." /></div>
-          <div><span class="p-priority pp2">P2 · Volume play</span></div>
-        </div>
-
-        <div class="pipeline-row">
-          <div>
-            <span class="p-name">Functional Medicine Practitioners</span>
-            <span class="p-sub">Recommend to patients directly</span>
-            <div style="margin-top:6px;">
-              <span class="status-dot s-prospect" onclick="cycleStatus(this)">● Prospect</span>
-            </div>
-          </div>
-          <div><div class="p-deal">$500–3K</div><div class="p-speed">recurring</div></div>
-          <div><div style="font-size:11px;color:var(--dim);">3–6 weeks</div></div>
-          <div><div style="font-size:10px;color:var(--dim);">Science brief + practitioner discount program</div>
-            <input class="edit-note" placeholder="Add note..." /></div>
-          <div><span class="p-priority pp3">P3 · Long-term</span></div>
-        </div>
       </div>
 
       <div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:32px;">
@@ -1238,56 +1168,9 @@
     ══════════════════════════════════════════ -->
     <div class="section" id="sec-revenue">
 
-      <div class="sec-label">Key Metrics</div>
-      <div class="rev-dashboard-grid">
-        <div class="rev-metric">
-          <div class="rm-label">D2C Monthly Revenue</div>
-          <div class="rm-val c-rust">~$20K</div>
-          <div class="rm-target">Target: $25K/mo</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:80%;background:var(--rust);"></div></div>
-        </div>
-        <div class="rev-metric">
-          <div class="rm-label">Active Churn Rate</div>
-          <div class="rm-val c-rust">5.25%</div>
-          <div class="rm-target">Target: under 3%</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:70%;background:var(--rust);"></div></div>
-        </div>
-        <div class="rev-metric">
-          <div class="rm-label">Payment Recovery Rate</div>
-          <div class="rm-val c-gold">33%</div>
-          <div class="rm-target">Target: 60–70%</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:33%;background:var(--gold);"></div></div>
-        </div>
-        <div class="rev-metric">
-          <div class="rm-label">Avg Subscriber LTV</div>
-          <div class="rm-val c-green">$452</div>
-          <div class="rm-target">Strong — protect every sub</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:75%;background:var(--green);"></div></div>
-        </div>
-        <div class="rev-metric">
-          <div class="rm-label">Avg Retention</div>
-          <div class="rm-val c-gold">4.5mo</div>
-          <div class="rm-target">Target: 7+ months</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:64%;background:var(--gold);"></div></div>
-        </div>
-        <div class="rev-metric">
-          <div class="rm-label">Email Revenue</div>
-          <div class="rm-val c-rust">~$0</div>
-          <div class="rm-target">Target: $5K/mo via flows</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:2%;background:var(--rust);"></div></div>
-        </div>
-        <div class="rev-metric">
-          <div class="rm-label">B2B Revenue</div>
-          <div class="rm-val c-blue">Inconsistent</div>
-          <div class="rm-target">Target: $10K/mo</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:20%;background:var(--blue);"></div></div>
-        </div>
-        <div class="rev-metric">
-          <div class="rm-label">60-Day Goal</div>
-          <div class="rm-val c-green">$40K</div>
-          <div class="rm-target">D2C + Email + B2B combined</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:50%;background:linear-gradient(90deg,var(--rust),var(--green));"></div></div>
-        </div>
+      <div class="sec-label">Key Metrics · <span style="color:var(--sage);font-size:9px;">Live from Airtable</span></div>
+      <div class="rev-dashboard-grid" id="at-revenue-metrics">
+        <div style="padding:20px;color:var(--muted);font-size:11px;grid-column:1/-1;">Loading from Airtable...</div>
       </div>
 
       <div class="sec-label">Where Money Is Leaking Right Now</div>
@@ -1346,6 +1229,7 @@
         <div class="cal-day-header">Fri</div>
       </div>
 
+      <div id="at-content-calendar">
       <div class="cal-week">
         <div class="cal-week-label">W1</div>
         <div class="cal-cell">
@@ -1600,7 +1484,263 @@
 
   // Init
   updateAllProgress();
+
+  // ── AIRTABLE INTEGRATION ──
+  const AT_BASE = 'appxpUFIzUwdCIrL4';
+
+  function getToken() { return localStorage.getItem('mycolove_at_token') || ''; }
+  function getHeaders() { return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' }; }
+  function getUrl() { return `https://api.airtable.com/v0/${AT_BASE}`; }
+
+  function showSetupScreen() { document.getElementById('setup-overlay').style.display = 'flex'; }
+  function hideSetupScreen() { document.getElementById('setup-overlay').style.display = 'none'; }
+
+  function saveToken() {
+    const input = document.getElementById('token-input').value.trim();
+    if (!input.startsWith('pat')) {
+      document.getElementById('token-error').textContent = 'Token should start with "pat" — check and try again.';
+      return;
+    }
+    localStorage.setItem('mycolove_at_token', input);
+    hideSetupScreen();
+    initAirtable();
+  }
+
+  function resetToken() { localStorage.removeItem('mycolove_at_token'); showSetupScreen(); }
+
+  async function atFetch(table) {
+    try {
+      const res = await fetch(`${getUrl()}/${encodeURIComponent(table)}`, { headers: getHeaders() });
+      const data = await res.json();
+      return data.records || [];
+    } catch(e) { console.error('Airtable fetch error:', e); return []; }
+  }
+
+  async function atPatch(table, recordId, fields) {
+    try {
+      await fetch(`${getUrl()}/${encodeURIComponent(table)}/${recordId}`, {
+        method: 'PATCH',
+        headers: getHeaders(),
+        body: JSON.stringify({ fields })
+      });
+    } catch(e) { console.error('Airtable patch error:', e); }
+  }
+
+  async function atCreate(table, fields) {
+    try {
+      const res = await fetch(`${getUrl()}/${encodeURIComponent(table)}`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ fields })
+      });
+      return await res.json();
+    } catch(e) { console.error('Airtable create error:', e); }
+  }
+
+  // ── LOAD REVENUE METRICS ──
+  async function loadRevenueMetrics() {
+    const records = await atFetch('Revenue Metrics');
+    if (!records.length) return;
+    const container = document.getElementById('at-revenue-metrics');
+    if (!container) return;
+    container.innerHTML = '';
+    const statusColors = { 'On Track': 'var(--green)', 'At Risk': 'var(--gold)', 'Behind': 'var(--rust)', 'Achieved': 'var(--sage)' };
+    const statusWidths = { 'On Track': '70%', 'At Risk': '45%', 'Behind': '25%', 'Achieved': '100%' };
+    records.forEach(r => {
+      const f = r.fields;
+      const color = statusColors[f.Status] || 'var(--muted)';
+      const width = statusWidths[f.Status] || '30%';
+      container.innerHTML += `
+        <div class="rev-metric">
+          <div class="rm-label">${f.Metric || ''}</div>
+          <div class="rm-val" style="color:${color}">${f['Current Value'] || '—'}</div>
+          <div class="rm-target">Target: ${f.Target || '—'} ${f.Notes ? '· ' + f.Notes : ''}</div>
+          <div class="rm-bar"><div class="rm-fill" style="width:${width};background:${color};"></div></div>
+        </div>`;
+    });
+  }
+
+  // ── LOAD B2B PIPELINE ──
+  async function loadB2BPipeline() {
+    const records = await atFetch('B2B Pipeline');
+    if (!records.length) return;
+    const container = document.getElementById('at-b2b-pipeline');
+    if (!container) return;
+    container.innerHTML = '';
+    const statusMap = {
+      'Prospect':  { cls: 's-prospect',  label: '● Prospect' },
+      'Contacted': { cls: 's-contacted', label: '● Contacted' },
+      'Warm':      { cls: 's-warm',      label: '● Warm' },
+      'Closed':    { cls: 's-closed',    label: '● Closed' },
+    };
+    const priorityMap = { 'P1': 'pp1', 'P2': 'pp2', 'P3': 'pp3' };
+
+    records.forEach(r => {
+      const f = r.fields;
+      const st = statusMap[f.Status] || statusMap['Prospect'];
+      const pc = priorityMap[f.Priority] || 'pp3';
+      container.innerHTML += `
+        <div class="pipeline-row" data-id="${r.id}">
+          <div>
+            <span class="p-name">${f.Company || 'Unnamed'}</span>
+            <span class="p-sub">${f.Category || ''}</span>
+            <div style="margin-top:6px;">
+              <span class="status-dot ${st.cls}" onclick="cycleStatusAt(this, '${r.id}')">${st.label}</span>
+            </div>
+          </div>
+          <div><div class="p-deal">${f['Deal Size'] || '—'}</div></div>
+          <div><div style="font-size:11px;color:var(--dim);">${f['Close Speed'] || '—'}</div></div>
+          <div>
+            <div style="font-size:10px;color:var(--dim);">${f['Outreach Angle'] || ''}</div>
+            <input class="edit-note" placeholder="Add note..." value="${f.Notes || ''}"
+              onblur="saveNote('${r.id}', this.value)" />
+          </div>
+          <div><span class="p-priority ${pc}">${f.Priority || 'P3'}</span></div>
+        </div>`;
+    });
+  }
+
+  // ── LOAD TASKS ──
+  async function loadTasks() {
+    const records = await atFetch('Tasks');
+    if (!records.length) return;
+    const container = document.getElementById('at-tasks');
+    if (!container) return;
+    container.innerHTML = '';
+    const ownerColors = { 'Shane': 'o-you', 'AI': 'o-ai', 'OpenClaw': 'o-oc', 'Shane + AI': 'o-you' };
+    const grouped = {};
+    records.forEach(r => {
+      const w = r.fields.Week || 'W1';
+      if (!grouped[w]) grouped[w] = [];
+      grouped[w].push(r);
+    });
+    Object.keys(grouped).sort().forEach(week => {
+      container.innerHTML += `<div style="margin-bottom:8px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);padding:8px 0 4px;border-bottom:1px solid var(--border);">${week}</div>`;
+      grouped[week].forEach(r => {
+        const f = r.fields;
+        const done = f.Status === 'Done';
+        const oc = ownerColors[f.Owner] || 'o-you';
+        container.innerHTML += `
+          <div class="task-item ${done ? 'done' : ''}" onclick="toggleTaskAt(this, '${r.id}')">
+            <div class="task-check">✓</div>
+            <div class="task-txt">${f.Task || ''}</div>
+            <div class="owner-tag ${oc}">${f.Owner || 'Shane'}</div>
+          </div>`;
+      });
+    });
+  }
+
+  // ── LOAD CONTENT CALENDAR ──
+  async function loadContentCalendar() {
+    const records = await atFetch('Content Calendar');
+    if (!records.length) return;
+    const container = document.getElementById('at-content-calendar');
+    if (!container) return;
+    const typeClass = {
+      'Email / Klaviyo': 'cal-email',
+      'IG Post': 'cal-social', 'IG Carousel': 'cal-social',
+      'TikTok Script': 'cal-social',
+      'Newsletter': 'cal-content',
+      'B2B Outreach': 'cal-b2b'
+    };
+    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+    const weeks = ['W1','W2','W3','W4','W5-8'];
+    let html = '';
+    weeks.forEach(week => {
+      html += `<div class="cal-week"><div class="cal-week-label">${week}</div>`;
+      days.forEach(day => {
+        const items = records.filter(r => r.fields.Week === week && r.fields.Day === day);
+        html += `<div class="cal-cell">`;
+        if (items.length) {
+          items.forEach(r => {
+            const tc = typeClass[r.fields.Type] || 'cal-content';
+            html += `<div class="cal-item ${tc}">${r.fields['Content Title'] || r.fields.Type}</div>`;
+          });
+        } else {
+          html += `<span class="cal-empty">—</span>`;
+        }
+        html += `</div>`;
+      });
+      html += `</div>`;
+    });
+    container.innerHTML = html;
+  }
+
+  // ── WRITE BACK: Status cycle with Airtable sync ──
+  async function cycleStatusAt(el, recordId) {
+    const current = statusCycle.findIndex(s => el.classList.contains(s.cls));
+    const next = (current + 1) % statusCycle.length;
+    statusCycle.forEach(s => el.classList.remove(s.cls));
+    el.classList.add(statusCycle[next].cls);
+    el.textContent = statusCycle[next].label;
+    const statusLabel = statusCycle[next].label.replace('● ', '');
+    await atPatch('B2B Pipeline', recordId, { Status: statusLabel });
+  }
+
+  // ── WRITE BACK: Notes ──
+  async function saveNote(recordId, value) {
+    await atPatch('B2B Pipeline', recordId, { Notes: value });
+  }
+
+  // ── WRITE BACK: Task toggle ──
+  async function toggleTaskAt(el, recordId) {
+    el.classList.toggle('done');
+    const isDone = el.classList.contains('done');
+    await atPatch('Tasks', recordId, { Status: isDone ? 'Done' : 'Not Started' });
+    updateAllProgress();
+  }
+
+  // ── SYNC INDICATOR ──
+  function showSyncStatus(msg, color) {
+    let el = document.getElementById('sync-status');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'sync-status';
+      el.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:8px 16px;border-radius:2px;font-size:10px;letter-spacing:0.1em;z-index:999;transition:opacity 0.5s;font-family:Syne Mono,monospace;';
+      document.body.appendChild(el);
+    }
+    el.style.background = color || 'var(--surface2)';
+    el.style.border = `1px solid ${color || 'var(--border)'}`;
+    el.style.color = 'var(--text)';
+    el.style.opacity = '1';
+    el.textContent = msg;
+    setTimeout(() => { el.style.opacity = '0'; }, 3000);
+  }
+
+  // ── INIT: Load all Airtable data ──
+  async function initAirtable() {
+    if (!getToken()) { showSetupScreen(); return; }
+    showSyncStatus('🍄 Syncing with Airtable...', 'var(--border)');
+    await Promise.all([
+      loadRevenueMetrics(),
+      loadB2BPipeline(),
+      loadTasks(),
+      loadContentCalendar()
+    ]);
+    showSyncStatus('✓ Synced with Airtable', 'var(--sage)');
+    updateAllProgress();
+  }
+
+  initAirtable();
 </script>
+
+
+<!-- ── SETUP OVERLAY ── -->
+<div id="setup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,13,8,0.95);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--border);padding:40px;max-width:480px;width:90%;border-left:3px solid var(--sage);">
+    <div style="font-family:'Cormorant Garamond',serif;font-size:9px;font-style:italic;letter-spacing:0.3em;color:var(--sage);text-transform:uppercase;margin-bottom:12px;">🍄 MycoLove</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:8px;">Connect <em style="font-style:italic;color:var(--sage);">Airtable</em></div>
+    <div style="font-size:11px;color:var(--dim);margin-bottom:28px;line-height:1.7;">Enter your Airtable Personal Access Token to connect Mission Control to your live data. This is stored only in your browser — never on GitHub or any server.</div>
+    <div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Personal Access Token</div>
+    <input id="token-input" type="password" placeholder="patXXXXXXXXXXXXXX..." style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne Mono',monospace;font-size:11px;padding:12px 14px;outline:none;margin-bottom:8px;" onkeydown="if(event.key==='Enter')saveToken()" />
+    <div id="token-error" style="font-size:10px;color:var(--rust);min-height:16px;margin-bottom:16px;"></div>
+    <button onclick="saveToken()" style="width:100%;background:var(--sage);border:none;color:var(--bg);font-family:'Syne Mono',monospace;font-size:11px;letter-spacing:0.1em;padding:12px;cursor:pointer;text-transform:uppercase;">Connect Mission Control</button>
+    <div style="margin-top:16px;font-size:10px;color:var(--muted);line-height:1.6;">
+      Get your token at <span style="color:var(--sage);">airtable.com → Developer Hub → Personal Access Tokens</span><br>
+      Scopes needed: <span style="color:var(--dim);">data.records:read · data.records:write · schema.bases:read</span>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
