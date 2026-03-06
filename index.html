@@ -7,1747 +7,619 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Syne+Mono&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0d08;
-    --surface: #111510;
-    --surface2: #181e14;
-    --surface3: #1e2619;
-    --border: #2a3325;
-    --border2: #1e2619;
-    --muted: #5a6b52;
-    --text: #d4dccb;
-    --dim: #8a9980;
-    --sage: #7a9e6e;
-    --green: #6db86b;
-    --gold: #c8a84b;
-    --rust: #c96b3a;
-    --red: #c94040;
-    --blue: #6b9ec9;
-    --purple: #9e7ac8;
+    --bg:#0a0d08;--surface:#111510;--surface2:#181e14;--border:#2a3325;
+    --muted:#5a6b52;--text:#d4dccb;--dim:#8a9980;--sage:#7a9e6e;
+    --green:#6db86b;--gold:#c8a84b;--rust:#c96b3a;--blue:#6b9ec9;
   }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--text);font-family:'Syne Mono',monospace;font-size:12px;line-height:1.6;display:flex;min-height:100vh;}
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  /* Sidebar */
+  .sidebar{width:220px;min-height:100vh;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;z-index:100;}
+  .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid var(--border);}
+  .sidebar-brand{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;}
+  .sidebar-brand em{font-style:italic;color:var(--sage);}
+  .sidebar-sub{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
+  .sidebar-target{padding:16px 20px;border-bottom:1px solid var(--border);}
+  .sidebar-target-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+  .sidebar-target-val{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;color:var(--gold);line-height:1;}
+  .sidebar-target-sub{font-size:9px;color:var(--muted);margin-top:2px;}
+  .sidebar-progress{padding:16px 20px;border-bottom:1px solid var(--border);}
+  .prog-label{font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .prog-pct{font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--sage);margin-top:4px;}
+  .prog-bar-bg{height:4px;background:var(--border);border-radius:2px;overflow:hidden;}
+  .prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--rust),var(--gold),var(--green));border-radius:2px;transition:width 0.5s;}
+  nav{flex:1;padding:12px 0;overflow-y:auto;}
+  .nav-section{font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);padding:10px 20px 6px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 20px;font-size:11px;color:var(--dim);cursor:pointer;transition:all 0.15s;border-left:2px solid transparent;}
+  .nav-item:hover{color:var(--text);background:var(--surface2);}
+  .nav-item.active{color:var(--sage);border-left-color:var(--sage);background:rgba(122,158,110,0.06);}
+  .nav-icon{font-size:14px;width:18px;text-align:center;}
+  .sidebar-footer{padding:16px 20px;border-top:1px solid var(--border);}
+  .reset-token-btn{font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;background:transparent;border:1px solid var(--border);padding:6px 12px;font-family:'Syne Mono',monospace;width:100%;transition:all 0.15s;}
+  .reset-token-btn:hover{border-color:var(--muted);color:var(--text);}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne Mono', monospace;
-    font-size: 12px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
+  /* Main */
+  .main{margin-left:220px;flex:1;}
+  .page{display:none;padding:40px 48px 80px;max-width:1020px;}
+  .page.active{display:block;}
 
-  canvas {
-    position: fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    pointer-events:none;
-    opacity:0.25;
-    z-index:0;
-  }
+  .sec{font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:var(--muted);margin-bottom:20px;display:flex;align-items:center;gap:12px;}
+  .sec::after{content:'';flex:1;height:1px;background:var(--border);}
 
-  /* ── LAYOUT ── */
-  .shell { display:flex; min-height:100vh; position:relative; z-index:1; }
+  .page-header{margin-bottom:40px;padding-bottom:28px;border-bottom:1px solid var(--border);}
+  .page-eyebrow{font-size:9px;letter-spacing:0.3em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  .page-title{font-family:'Cormorant Garamond',serif;font-size:clamp(28px,4vw,48px);font-weight:300;line-height:1.05;}
+  .page-title em{font-style:italic;color:var(--sage);}
+  .page-subtitle{margin-top:8px;font-size:11px;color:var(--muted);max-width:560px;line-height:1.7;}
 
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: 220px;
-    flex-shrink: 0;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    top: 0;
-    height: 100vh;
-    overflow-y: auto;
-  }
-
-  .sidebar-logo {
-    padding: 28px 20px 20px;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .sidebar-brand {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 9px;
-    font-style: italic;
-    letter-spacing: 0.3em;
-    color: var(--sage);
-    text-transform: uppercase;
-    margin-bottom: 4px;
-  }
-
-  .sidebar-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text);
-    line-height: 1.1;
-  }
-
-  .sidebar-title em { font-style:italic; color:var(--sage); }
-
-  .sidebar-status {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-top: 8px;
-    font-size: 9px;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-  }
-
-  .pulse {
-    width:5px; height:5px;
-    border-radius:50%;
-    background: var(--green);
-    animation: pulse 2s infinite;
-    flex-shrink:0;
-  }
-
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
-
-  .sidebar-nav { padding: 16px 0; flex:1; }
-
-  .nav-section-label {
-    font-size: 8px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--muted);
-    padding: 6px 20px 4px;
-  }
-
-  .nav-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 20px;
-    cursor: pointer;
-    transition: all 0.15s;
-    font-size: 11px;
-    color: var(--dim);
-    border-left: 2px solid transparent;
-  }
-
-  .nav-item:hover { background: var(--surface2); color: var(--text); }
-  .nav-item.active { background: var(--surface2); color: var(--text); border-left-color: var(--sage); }
-
-  .nav-icon { font-size: 14px; width: 18px; text-align:center; flex-shrink:0; }
-
-  .sidebar-footer {
-    padding: 16px 20px;
-    border-top: 1px solid var(--border);
-  }
-
-  .target-label { font-size: 8px; letter-spacing:0.15em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
-  .target-val {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 26px;
-    font-weight: 600;
-    color: var(--gold);
-    line-height: 1;
-  }
-  .target-sub { font-size: 9px; color: var(--muted); margin-top:2px; }
-
-  /* ── MAIN CONTENT ── */
-  .main { flex:1; overflow-x:hidden; }
-
-  /* ── TOPBAR ── */
-  .topbar {
-    padding: 20px 36px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-    background: var(--surface);
-  }
-
-  .topbar-section-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--text);
-  }
-
-  .topbar-meta { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-  .topbar-right { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-
-  .pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 5px 12px;
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    color: var(--dim);
-  }
-
-  .pill-green { border-color: var(--green); color: var(--green); }
-  .pill-gold { border-color: var(--gold); color: var(--gold); }
-  .pill-rust { border-color: var(--rust); color: var(--rust); }
-
-  /* ── SECTIONS ── */
-  .section { display: none; padding: 36px; }
-  .section.active { display: block; }
-
-  .sec-label {
-    font-size: 9px;
-    letter-spacing: 0.25em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .sec-label::after { content:''; flex:1; height:1px; background:var(--border); }
-
-  /* ── OVERVIEW / DASHBOARD ── */
-  .overview-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-bottom: 36px;
-  }
-
-  .ov-card {
-    background: var(--surface);
-    padding: 20px 18px;
-    transition: background 0.15s;
-  }
-  .ov-card:hover { background: var(--surface2); }
-
-  .ov-label { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
-  .ov-val {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 28px;
-    font-weight: 600;
-    line-height: 1;
-  }
-  .ov-note { font-size:10px; color:var(--muted); margin-top:4px; }
-  .c-green { color: var(--green); }
-  .c-gold { color: var(--gold); }
-  .c-rust { color: var(--rust); }
-  .c-blue { color: var(--blue); }
-  .c-sage { color: var(--sage); }
+  /* Stats */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:40px;}
+  .stat-item{background:var(--surface);padding:18px;}
+  .stat-label{font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+  .stat-val{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;line-height:1;}
+  .stat-note{font-size:10px;color:var(--muted);margin-top:4px;}
+  .bad{color:var(--rust);}.warn{color:var(--gold);}.good{color:var(--green);}.oppty{color:var(--blue);}
 
   /* Revenue bars */
-  .rev-section { margin-bottom: 36px; }
-  .rev-row { display:grid; grid-template-columns:140px 1fr 90px; gap:12px; align-items:center; margin-bottom:10px; }
-  .rev-label { font-size:10px; color:var(--dim); }
-  .rev-bar-bg { background:var(--border); height:26px; border-radius:1px; overflow:hidden; position:relative; }
-  .rev-bar { height:100%; display:flex; align-items:center; padding-left:10px; font-size:10px; color:rgba(255,255,255,0.65); border-radius:1px; transition: width 0.8s ease; }
-  .rev-amt { font-family:'Cormorant Garamond',serif; font-size:17px; font-weight:600; text-align:right; }
+  .rev-grid{display:flex;flex-direction:column;gap:10px;margin-bottom:40px;}
+  .rev-row{display:grid;grid-template-columns:140px 1fr 80px;gap:12px;align-items:center;}
+  .rev-label{font-size:10px;color:var(--dim);}
+  .rev-bar-bg{background:var(--border);height:22px;border-radius:1px;overflow:hidden;}
+  .rev-bar{height:100%;display:flex;align-items:center;padding-left:10px;font-size:10px;color:rgba(255,255,255,0.65);border-radius:1px;}
+  .rev-amt{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;text-align:right;}
 
-  /* Flow diagram */
-  .flow { display:flex; align-items:center; justify-content:center; gap:0; flex-wrap:wrap; margin-bottom:36px; }
-  .flow-node { background:var(--surface); border:1px solid var(--border); padding:14px 18px; text-align:center; min-width:130px; flex:1; }
-  .flow-node.highlight { border-color:var(--sage); background:rgba(122,158,110,0.05); }
-  .flow-node-icon { font-size:20px; margin-bottom:4px; }
-  .flow-node-name { font-family:'Cormorant Garamond',serif; font-size:13px; font-weight:600; color:var(--text); }
-  .flow-node-sub { font-size:9px; color:var(--muted); margin-top:2px; }
-  .flow-arrow { font-size:16px; color:var(--border); padding:0 4px; flex-shrink:0; }
+  /* Flow */
+  .flow{display:flex;align-items:center;margin-bottom:40px;flex-wrap:wrap;}
+  .flow-node{background:var(--surface);border:1px solid var(--border);padding:14px 18px;text-align:center;flex:1;min-width:120px;}
+  .flow-node-icon{font-size:20px;margin-bottom:4px;}
+  .flow-node-name{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;}
+  .flow-node-sub{font-size:9px;color:var(--muted);margin-top:2px;}
+  .flow-arrow{font-size:16px;color:var(--border);padding:0 4px;flex-shrink:0;}
 
-  /* ── WEEKLY TODO ── */
-  .week-select {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    flex-wrap: wrap;
-  }
+  /* Bleed box */
+  .bleed-box{background:rgba(201,64,64,0.07);border:1px solid rgba(201,64,64,0.25);padding:24px 28px;margin-bottom:40px;}
+  .bleed-box h3{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--rust);margin-bottom:14px;}
+  .bleed-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(201,64,64,0.12);flex-wrap:wrap;gap:8px;}
+  .bleed-row:last-child{border-bottom:none;}
+  .bleed-label{font-size:11px;color:var(--dim);}
+  .bleed-fix{font-size:10px;color:var(--green);margin-top:2px;}
+  .bleed-num{font-family:'Cormorant Garamond',serif;font-size:19px;font-weight:600;color:var(--rust);white-space:nowrap;}
 
-  .week-btn {
-    padding: 6px 16px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--dim);
-    font-family: 'Syne Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    cursor: pointer;
-    transition: all 0.15s;
-    border-radius: 2px;
-  }
+  /* Tasks */
+  .week-tabs{display:flex;gap:4px;margin-bottom:24px;flex-wrap:wrap;}
+  .week-tab{padding:7px 16px;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all 0.15s;background:transparent;font-family:'Syne Mono',monospace;}
+  .week-tab:hover{border-color:var(--muted);color:var(--text);}
+  .week-tab.active{border-color:var(--sage);color:var(--sage);background:rgba(122,158,110,0.06);}
 
-  .week-btn:hover { border-color: var(--muted); color: var(--text); }
-  .week-btn.active { background: var(--sage); border-color: var(--sage); color: var(--bg); }
+  .tasks-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px;}
+  .tasks-week-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;}
+  .tasks-week-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+  .week-stats{display:flex;gap:16px;align-items:center;}
+  .week-stat{font-size:10px;color:var(--dim);}
+  .week-stat strong{color:var(--sage);font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;}
 
-  .week-panel { display:none; }
-  .week-panel.active { display:block; }
+  .engine-group{margin-bottom:16px;border:1px solid var(--border);background:var(--surface);}
+  .engine-group-header{padding:10px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .engine-group-name{font-size:10px;letter-spacing:0.15em;text-transform:uppercase;}
+  .engine-tag-email{color:var(--green);}
+  .engine-tag-leads{color:var(--gold);}
+  .engine-tag-news{color:var(--sage);}
+  .engine-tag-general{color:var(--muted);}
+  .engine-group-count{font-size:9px;color:var(--muted);}
 
-  .week-header-bar {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 20px 24px;
-    margin-bottom: 16px;
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
+  .task-row{display:flex;gap:12px;align-items:flex-start;padding:11px 18px;border-bottom:1px solid #181e14;cursor:pointer;transition:background 0.1s;}
+  .task-row:last-child{border-bottom:none;}
+  .task-row:hover{background:var(--surface2);}
+  .task-check{width:15px;height:15px;border:1px solid var(--border);border-radius:2px;flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:9px;color:transparent;transition:all 0.15s;}
+  .task-row.done .task-check{background:var(--sage);border-color:var(--sage);color:var(--bg);}
+  .task-row.done .task-text{text-decoration:line-through;color:var(--muted);}
+  .task-text{flex:1;font-size:11px;color:var(--dim);line-height:1.5;}
+  .task-owner{font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap;flex-shrink:0;margin-top:2px;}
+  .owner-shane{border-color:var(--gold);color:var(--gold);}
+  .owner-ai{border-color:var(--blue);color:var(--blue);}
+  .owner-myco{border-color:var(--sage);color:var(--sage);}
+  .owner-shaneai{border-color:var(--green);color:var(--green);}
+  .task-priority{width:5px;height:5px;border-radius:50%;flex-shrink:0;margin-top:6px;}
+  .p-high{background:var(--rust);}.p-med{background:var(--gold);}.p-low{background:var(--muted);}
 
-  .wh-num {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 48px;
-    font-weight: 300;
-    line-height: 1;
-    min-width: 56px;
-  }
+  /* Pipeline */
+  .pipeline-table{width:100%;border-collapse:collapse;margin-bottom:40px;}
+  .pipeline-table th{text-align:left;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);padding:10px 14px;border-bottom:1px solid var(--border);}
+  .pipeline-table td{padding:13px 14px;border-bottom:1px solid #181e14;font-size:11px;color:var(--dim);vertical-align:top;}
+  .pipeline-table tr:hover td{background:var(--surface2);}
+  .company-name{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:600;color:var(--text);display:block;margin-bottom:2px;}
+  .deal-size{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--green);}
+  .status-badge{display:inline-block;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid;cursor:pointer;transition:all 0.15s;}
+  .status-prospect{border-color:var(--muted);color:var(--muted);}
+  .status-contacted{border-color:var(--blue);color:var(--blue);}
+  .status-warm{border-color:var(--gold);color:var(--gold);}
+  .status-closed{border-color:var(--green);color:var(--green);}
+  .priority-badge{display:inline-block;font-size:9px;padding:2px 7px;border-radius:20px;border:1px solid;}
+  .p1{border-color:var(--rust);color:var(--rust);}
+  .p2{border-color:var(--gold);color:var(--gold);}
+  .p3{border-color:var(--muted);color:var(--muted);}
 
-  .wh-info { flex:1; }
-  .wh-tag { font-size:9px; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:3px; }
-  .wh-title { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; }
-  .wh-sub { font-size:10px; color:var(--dim); margin-top:3px; }
-  .wh-target { font-family:'Cormorant Garamond',serif; font-size:17px; text-align:right; }
-  .wh-target span { display:block; font-size:9px; font-family:'Syne Mono',monospace; color:var(--muted); margin-top:2px; }
+  /* Metrics */
+  .metrics-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:40px;}
+  .metric-card{background:var(--surface);border:1px solid var(--border);padding:20px;}
+  .metric-name{font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  .metric-current{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;line-height:1;}
+  .metric-target{font-size:10px;color:var(--muted);margin-top:4px;}
+  .metric-status{display:inline-block;font-size:9px;padding:2px 8px;border-radius:20px;border:1px solid;margin-top:8px;}
+  .ms-track{border-color:var(--green);color:var(--green);}
+  .ms-risk{border-color:var(--gold);color:var(--gold);}
+  .ms-behind{border-color:var(--rust);color:var(--rust);}
+  .ms-achieved{border-color:var(--sage);color:var(--sage);}
 
-  .task-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1px; background:var(--border); border:1px solid var(--border); }
-  .task-col { background:var(--surface); padding:20px 22px; }
-  .task-col-label { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  /* Calendar */
+  .cal-grid{display:grid;grid-template-columns:80px repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:24px;}
+  .cal-cell{background:var(--surface);padding:10px 12px;font-size:10px;}
+  .cal-header{background:var(--surface2);font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);}
+  .cal-week{background:var(--surface2);font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;color:var(--sage);display:flex;align-items:center;justify-content:center;}
+  .cal-task{font-size:10px;color:var(--dim);line-height:1.4;}
+  .cal-task-owner{font-size:9px;margin-top:4px;}
 
-  .task-item {
-    display:flex; gap:10px; align-items:flex-start;
-    padding:8px 0;
-    border-bottom:1px solid var(--border2);
-    cursor:pointer;
-    transition:opacity 0.15s;
-  }
-  .task-item:last-child { border-bottom:none; }
+  /* Loading */
+  .loading-state{padding:40px;text-align:center;color:var(--muted);font-size:11px;}
+  .spin{display:inline-block;animation:spin 1s linear infinite;margin-right:8px;}
+  @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 
-  .task-check {
-    width:14px; height:14px;
-    border:1px solid var(--border);
-    border-radius:2px;
-    flex-shrink:0;
-    margin-top:2px;
-    display:flex; align-items:center; justify-content:center;
-    font-size:9px;
-    color:transparent;
-    transition:all 0.15s;
-  }
-
-  .task-item.done .task-check { background:var(--sage); border-color:var(--sage); color:var(--bg); }
-  .task-item.done .task-txt { text-decoration:line-through; color:var(--muted); }
-  .task-txt { font-size:11px; color:var(--dim); line-height:1.5; flex:1; }
-
-  .owner-tag {
-    font-size:9px; padding:2px 7px;
-    border-radius:20px; border:1px solid;
-    flex-shrink:0; white-space:nowrap;
-    margin-top:2px;
-  }
-  .o-you { border-color:var(--gold); color:var(--gold); }
-  .o-ai { border-color:var(--blue); color:var(--blue); }
-  .o-oc { border-color:var(--sage); color:var(--sage); }
-
-  /* ── 60-DAY CHECKLIST ── */
-  .engine-block { border:1px solid var(--border); background:var(--surface); margin-bottom:12px; border-radius:2px; overflow:hidden; }
-  .engine-block.e1 { border-left:3px solid var(--green); }
-  .engine-block.e2 { border-left:3px solid var(--gold); }
-  .engine-block.e3 { border-left:3px solid var(--sage); }
-
-  .engine-head {
-    display:flex; align-items:center; gap:16px;
-    padding:18px 22px;
-    cursor:pointer;
-    transition:background 0.2s;
-  }
-  .engine-head:hover { background:var(--surface2); }
-
-  .engine-num {
-    font-family:'Cormorant Garamond',serif;
-    font-size:42px; font-weight:300; line-height:1;
-    min-width:44px; opacity:0.4;
-  }
-  .e1 .engine-num { color:var(--green); opacity:0.6; }
-  .e2 .engine-num { color:var(--gold); opacity:0.5; }
-  .e3 .engine-num { color:var(--sage); opacity:0.45; }
-
-  .engine-info { flex:1; }
-  .engine-tag { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; margin-bottom:3px; }
-  .e1 .engine-tag { color:var(--green); }
-  .e2 .engine-tag { color:var(--gold); }
-  .e3 .engine-tag { color:var(--sage); }
-
-  .engine-name { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; }
-  .engine-why { font-size:10px; color:var(--dim); margin-top:2px; }
-
-  .chevron { font-size:16px; color:var(--muted); transition:transform 0.3s; }
-  .engine-block.open .chevron { transform:rotate(180deg); }
-
-  .engine-body { display:none; border-top:1px solid var(--border); }
-  .engine-block.open .engine-body { display:block; }
-  .engine-inner { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:0; }
-  .ec { padding:18px 22px; border-right:1px solid var(--border); }
-  .ec:last-child { border-right:none; }
-  .ec-label { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; padding-bottom:6px; border-bottom:1px solid var(--border); }
-
-  /* ── B2B PIPELINE ── */
-  .pipeline-header {
-    display: grid;
-    grid-template-columns: 200px 110px 110px 1fr 100px;
-    gap: 12px;
-    padding: 10px 16px;
-    font-size: 9px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .pipeline-row {
-    display: grid;
-    grid-template-columns: 200px 110px 110px 1fr 100px;
-    gap: 12px;
-    padding: 14px 16px;
-    border-bottom: 1px solid var(--border2);
-    transition: background 0.15s;
-    align-items: start;
-  }
-  .pipeline-row:hover { background: var(--surface2); }
-
-  .p-name {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
-    display: block;
-    margin-bottom: 2px;
-  }
-  .p-sub { font-size:10px; color:var(--dim); }
-  .p-deal { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--green); }
-  .p-speed { font-size:10px; color:var(--dim); }
-
-  .status-dot {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 10px;
-    border-radius: 20px;
-    border: 1px solid;
-  }
-  .s-prospect { border-color:var(--muted); color:var(--muted); }
-  .s-contacted { border-color:var(--gold); color:var(--gold); }
-  .s-warm { border-color:var(--green); color:var(--green); }
-  .s-closed { border-color:var(--sage); color:var(--sage); background:rgba(122,158,110,0.1); }
-
-  .p-priority {
-    font-size: 9px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border-radius: 20px;
-    border: 1px solid;
-    display: inline-block;
-  }
-  .pp1 { border-color:var(--rust); color:var(--rust); }
-  .pp2 { border-color:var(--gold); color:var(--gold); }
-  .pp3 { border-color:var(--muted); color:var(--muted); }
-
-  .edit-note {
-    font-size:10px; color:var(--dim);
-    border:none; background:transparent;
-    font-family:'Syne Mono',monospace;
-    width:100%; outline:none;
-    padding:2px 0;
-    cursor:text;
-  }
-  .edit-note::placeholder { color:var(--border); }
-  .edit-note:focus { color:var(--text); }
-
-  /* ── REVENUE DASHBOARD ── */
-  .rev-dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-bottom: 32px;
-  }
-
-  .rev-metric {
-    background: var(--surface);
-    padding: 22px 20px;
-  }
-
-  .rm-label { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:6px; }
-  .rm-val { font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:600; line-height:1; }
-  .rm-target { font-size:10px; color:var(--muted); margin-top:4px; }
-  .rm-bar { height:3px; background:var(--border); border-radius:2px; margin-top:10px; overflow:hidden; }
-  .rm-fill { height:100%; border-radius:2px; }
-
-  .bleed-strip {
-    background: rgba(201,64,64,0.07);
-    border: 1px solid rgba(201,64,64,0.25);
-    padding: 24px 28px;
-    margin-bottom: 32px;
-  }
-
-  .bleed-title {
-    font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--rust);
-    margin-bottom: 14px;
-  }
-
-  .bleed-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(201,64,64,0.12);
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  .bleed-row:last-child { border-bottom: none; }
-  .bleed-label { font-size:11px; color:var(--dim); flex:1; }
-  .bleed-fix { font-size:9px; color:var(--green); margin-top:2px; }
-  .bleed-num { font-family:'Cormorant Garamond',serif; font-size:18px; font-weight:600; color:var(--rust); }
-
-  /* ── CONTENT CALENDAR ── */
-  .calendar-header {
-    display: grid;
-    grid-template-columns: 100px repeat(5, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    margin-bottom: 16px;
-  }
-
-  .cal-day-header {
-    background: var(--surface2);
-    padding: 10px 14px;
-    font-size: 9px;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--muted);
-    text-align: center;
-  }
-
-  .cal-week {
-    display: grid;
-    grid-template-columns: 100px repeat(5, 1fr);
-    gap: 1px;
-    background: var(--border);
-    border: 1px solid var(--border);
-    border-top: none;
-    margin-bottom: 4px;
-  }
-
-  .cal-week-label {
-    background: var(--surface2);
-    padding: 14px 10px;
-    font-size: 9px;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--sage);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .cal-cell {
-    background: var(--surface);
-    padding: 12px 14px;
-    min-height: 80px;
-    font-size: 10px;
-    color: var(--dim);
-  }
-
-  .cal-item {
-    padding: 4px 8px;
-    border-radius: 2px;
-    margin-bottom: 4px;
-    font-size: 9px;
-    line-height: 1.4;
-    border-left: 2px solid;
-  }
-
-  .cal-email { background:rgba(109,184,107,0.08); border-color:var(--green); color:var(--green); }
-  .cal-social { background:rgba(107,158,201,0.08); border-color:var(--blue); color:var(--blue); }
-  .cal-b2b { background:rgba(200,168,75,0.08); border-color:var(--gold); color:var(--gold); }
-  .cal-content { background:rgba(158,122,200,0.08); border-color:var(--purple); color:var(--purple); }
-  .cal-empty { color:var(--border); font-size:9px; }
-
-  .cal-legend { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:20px; }
-  .cal-legend-item { display:flex; align-items:center; gap:6px; font-size:9px; color:var(--dim); }
-  .cal-dot { width:8px; height:8px; border-radius:1px; }
-
-  /* ── PROGRESS FOOTER ── */
-  .progress-bar-section {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    padding: 20px 28px;
-    display: flex;
-    gap: 24px;
-    align-items: center;
-    flex-wrap: wrap;
-    margin-top: 36px;
-  }
-
-  .pb-label { font-size:9px; letter-spacing:0.18em; text-transform:uppercase; color:var(--muted); margin-bottom:4px; }
-  .pb-val { font-family:'Cormorant Garamond',serif; font-size:32px; font-weight:300; color:var(--sage); line-height:1; }
-  .pb-wrap { flex:1; min-width:180px; }
-  .pb-bg { height:5px; background:var(--border); border-radius:3px; margin-top:8px; overflow:hidden; }
-  .pb-fill { height:100%; background:linear-gradient(90deg,var(--rust),var(--gold),var(--green)); border-radius:3px; transition:width 0.5s; }
-  .pb-pct { font-size:11px; color:var(--muted); margin-top:4px; }
-
-  .reset-btn {
-    font-size:10px; letter-spacing:0.1em; text-transform:uppercase;
-    color:var(--muted); cursor:pointer;
-    border:1px solid var(--border); padding:8px 16px;
-    background:transparent; font-family:'Syne Mono',monospace;
-    transition:all 0.15s;
-  }
-  .reset-btn:hover { border-color:var(--muted); color:var(--text); }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(12px); }
-    to { opacity:1; transform:translateY(0); }
-  }
-
-  .section.active > * { animation: fadeUp 0.4s ease both; }
-  .section.active > *:nth-child(2) { animation-delay:0.06s; }
-  .section.active > *:nth-child(3) { animation-delay:0.12s; }
-  .section.active > *:nth-child(4) { animation-delay:0.18s; }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 768px) {
-    .sidebar { display:none; }
-    .pipeline-header, .pipeline-row { grid-template-columns: 1fr 1fr; }
-    .pipeline-header > *:nth-child(n+3), .pipeline-row > *:nth-child(n+3) { display:none; }
-  }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width:4px; }
-  ::-webkit-scrollbar-track { background:var(--bg); }
-  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  /* Setup overlay */
+  #setup-overlay{display:none;position:fixed;inset:0;background:rgba(10,13,8,0.96);z-index:999;align-items:center;justify-content:center;}
+  .setup-box{background:var(--surface);border:1px solid var(--border);padding:48px;max-width:480px;width:90%;}
+  .setup-title{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;margin-bottom:8px;}
+  .setup-title em{font-style:italic;color:var(--sage);}
+  .setup-sub{font-size:11px;color:var(--muted);margin-bottom:28px;line-height:1.6;}
+  .setup-input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'Syne Mono',monospace;font-size:12px;padding:12px 14px;margin-bottom:12px;outline:none;}
+  .setup-input:focus{border-color:var(--sage);}
+  .setup-btn{width:100%;background:var(--sage);color:var(--bg);border:none;font-family:'Syne Mono',monospace;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;padding:13px;cursor:pointer;transition:opacity 0.15s;}
+  .setup-btn:hover{opacity:0.85;}
+  .setup-error{font-size:10px;color:var(--rust);margin-bottom:10px;min-height:14px;}
+  .setup-hint{font-size:10px;color:var(--muted);margin-top:12px;line-height:1.6;}
 </style>
 </head>
 <body>
 
-<canvas id="spores"></canvas>
-
-<div class="shell">
-
-  <!-- ── SIDEBAR ── -->
-  <aside class="sidebar">
-    <div class="sidebar-logo">
-      <div class="sidebar-brand">🍄 MycoLove</div>
-      <div class="sidebar-title">Mission<br><em>Control</em></div>
-      <div class="sidebar-status"><div class="pulse"></div> Sprint Active</div>
-    </div>
-
-    <nav class="sidebar-nav">
-      <div class="nav-section-label">Overview</div>
-      <div class="nav-item active" onclick="showSection('overview', this)">
-        <span class="nav-icon">🌐</span> Dashboard
-      </div>
-
-      <div class="nav-section-label" style="margin-top:8px;">Execution</div>
-      <div class="nav-item" onclick="showSection('weekly', this)">
-        <span class="nav-icon">📅</span> Weekly To-Dos
-      </div>
-      <div class="nav-item" onclick="showSection('sprint', this)">
-        <span class="nav-icon">🗂</span> 60-Day Checklist
-      </div>
-
-      <div class="nav-section-label" style="margin-top:8px;">Pipeline</div>
-      <div class="nav-item" onclick="showSection('b2b', this)">
-        <span class="nav-icon">🤝</span> B2B Pipeline
-      </div>
-      <div class="nav-item" onclick="showSection('revenue', this)">
-        <span class="nav-icon">📊</span> Revenue Dashboard
-      </div>
-
-      <div class="nav-section-label" style="margin-top:8px;">Content</div>
-      <div class="nav-item" onclick="showSection('calendar', this)">
-        <span class="nav-icon">📰</span> Content Calendar
-      </div>
-    </nav>
-
-    <div class="sidebar-footer">
-      <div style="margin-bottom:16px;"><button onclick="resetToken()" style="background:transparent;border:1px solid var(--border);color:var(--muted);font-family:'Syne Mono',monospace;font-size:9px;letter-spacing:0.1em;padding:5px 12px;cursor:pointer;width:100%;text-transform:uppercase;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--muted)'" onmouseout="this.style.borderColor='var(--border)'">⚙ Reset Airtable Token</button></div>
-      <div class="target-label">60-Day Target</div>
-      <div class="target-val">$40K</div>
-      <div class="target-sub">D2C + B2B / month</div>
-      <div style="margin-top:12px;">
-        <div class="target-label" style="margin-bottom:4px;">Sprint Progress</div>
-        <div style="font-size:10px;color:var(--dim);" id="sidebar-pct">0% complete</div>
-        <div style="height:3px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden;">
-          <div id="sidebar-fill" style="height:100%;background:linear-gradient(90deg,var(--rust),var(--green));border-radius:2px;width:0%;transition:width 0.5s;"></div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- ── MAIN ── -->
-  <main class="main">
-
-    <!-- TOPBAR -->
-    <div class="topbar">
-      <div>
-        <div class="topbar-section-title" id="section-title">Dashboard</div>
-        <div class="topbar-meta" id="section-meta">Overview of all systems · MycoLove 60-Day Sprint</div>
-      </div>
-      <div class="topbar-right">
-        <div class="pill pill-rust">D2C ~$20K now</div>
-        <div class="pill pill-gold">Target $40K/mo</div>
-        <div class="pill pill-green">Email 20K list</div>
-      </div>
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         SECTION 1: DASHBOARD / OVERVIEW
-    ══════════════════════════════════════════ -->
-    <div class="section active" id="sec-overview">
-
-      <div class="sec-label">Current Situation</div>
-      <div class="overview-grid">
-        <div class="ov-card">
-          <div class="ov-label">D2C Revenue</div>
-          <div class="ov-val c-rust">~$20K</div>
-          <div class="ov-note">Declining · stabilize first</div>
-        </div>
-        <div class="ov-card">
-          <div class="ov-label">B2B Revenue</div>
-          <div class="ov-val c-gold">Inconsistent</div>
-          <div class="ov-note">Target: $20K/mo</div>
-        </div>
-        <div class="ov-card">
-          <div class="ov-label">Email List</div>
-          <div class="ov-val c-gold">20K</div>
-          <div class="ov-note">Underutilized asset</div>
-        </div>
-        <div class="ov-card">
-          <div class="ov-label">Active Churn</div>
-          <div class="ov-val c-rust">5.25%</div>
-          <div class="ov-note">Target: under 3%</div>
-        </div>
-        <div class="ov-card">
-          <div class="ov-label">Failed Payment Recovery</div>
-          <div class="ov-val c-gold">33%</div>
-          <div class="ov-note">Industry avg: 60–70%</div>
-        </div>
-        <div class="ov-card">
-          <div class="ov-label">Avg Sub LTV</div>
-          <div class="ov-val c-green">$452</div>
-          <div class="ov-note">Strong — protect every sub</div>
-        </div>
-        <div class="ov-card">
-          <div class="ov-label">IG Followers</div>
-          <div class="ov-val c-sage">12K</div>
-          <div class="ov-note">+ 2K TikTok</div>
-        </div>
-        <div class="ov-card">
-          <div class="ov-label">B2B Opportunity</div>
-          <div class="ov-val c-blue">$50K+</div>
-          <div class="ov-note">Per beverage deal possible</div>
-        </div>
-      </div>
-
-      <div class="sec-label">Revenue Path to $40K/Month</div>
-      <div class="rev-section">
-        <div class="rev-row">
-          <div class="rev-label">D2C Subscriptions</div>
-          <div class="rev-bar-bg"><div class="rev-bar" style="width:62%;background:var(--rust);">Current ~$20K</div></div>
-          <div class="rev-amt c-gold">→ $25K</div>
-        </div>
-        <div class="rev-row">
-          <div class="rev-label">Email Flows</div>
-          <div class="rev-bar-bg"><div class="rev-bar" style="width:4%;background:var(--gold);">$0</div></div>
-          <div class="rev-amt c-gold">→ $5K</div>
-        </div>
-        <div class="rev-row">
-          <div class="rev-label">B2B Liquid Extract</div>
-          <div class="rev-bar-bg"><div class="rev-bar" style="width:20%;background:var(--blue);">Inconsistent</div></div>
-          <div class="rev-amt c-green">→ $10K</div>
-        </div>
-        <div class="rev-row">
-          <div class="rev-label">60-Day Goal</div>
-          <div class="rev-bar-bg"><div class="rev-bar" style="width:82%;background:linear-gradient(90deg,var(--rust),var(--green));">→ $40K/mo</div></div>
-          <div class="rev-amt c-green" style="font-size:20px;">$40K</div>
-        </div>
-      </div>
-
-      <div class="sec-label">How The Three Engines Connect</div>
-      <div class="flow">
-        <div class="flow-node">
-          <div class="flow-node-icon">📧</div>
-          <div class="flow-node-name">Email Machine</div>
-          <div class="flow-node-sub">Stabilizes D2C</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node">
-          <div class="flow-node-icon">🤝</div>
-          <div class="flow-node-name">Leads Engine</div>
-          <div class="flow-node-sub">Builds B2B</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node">
-          <div class="flow-node-icon">📰</div>
-          <div class="flow-node-name">News Engine</div>
-          <div class="flow-node-sub">Fuels Authority</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-node highlight">
-          <div class="flow-node-icon">🌐</div>
-          <div class="flow-node-name">Mycelial Network</div>
-          <div class="flow-node-sub">Self-sustaining</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         SECTION 2: WEEKLY TO-DOS
-    ══════════════════════════════════════════ -->
-    <div class="section" id="sec-weekly">
-      <div class="sec-label">Select Your Current Week</div>
-
-      <div class="week-select">
-        <button class="week-btn active" onclick="showWeek('w1', this)">Week 1</button>
-        <button class="week-btn" onclick="showWeek('w2', this)">Week 2</button>
-        <button class="week-btn" onclick="showWeek('w3', this)">Week 3</button>
-        <button class="week-btn" onclick="showWeek('w4', this)">Week 4</button>
-        <button class="week-btn" onclick="showWeek('w5', this)">Weeks 5–8</button>
-      </div>
-
-      <!-- Week 1 -->
-      <div class="week-panel active" id="wp-w1">
-        <div class="week-header-bar">
-          <div class="wh-num c-rust">W1</div>
-          <div class="wh-info">
-            <div class="wh-tag c-rust">Days 1–7 · Stop the Bleed</div>
-            <div class="wh-title">Fix Failed Payments + Launch Subscription Save</div>
-            <div class="wh-sub">Highest revenue-per-hour actions. Do nothing else until these are live.</div>
-          </div>
-          <div class="wh-target c-rust">+$2–4K<span>recoverable this week</span></div>
-        </div>
-        <div class="task-grid">
-          <div class="task-col">
-            <div class="task-col-label">OpenClaw: Connect & Configure</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Connect OpenClaw to Shopify + Klaviyo APIs</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Set up dunning agent: trigger on failed payment, retry Day 1 / 3 / 7 with email + SMS</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Configure payment retry logic: 3 attempts over 7 days before cancellation</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Write failed payment email sequence (3 emails)</div><div class="owner-tag o-ai">AI</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">Klaviyo: Subscription Save Flow</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build cancel-intent trigger in Klaviyo</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Email 1 (immediate): "Before you go" — offer pause instead of cancel</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Email 2 (24hr): Education re-hook — remind them why Lion's Mane takes 4–6 weeks</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Email 3 (48hr): Last chance — 15% off or skip a month option</div><div class="owner-tag o-ai">AI</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">B2B: Start Pipeline Now</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Identify 10 beverage brands already using adaptogens</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Write liquid extract pitch one-pager</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Send 10 personalized IG DMs or cold emails to beverage brands</div><div class="owner-tag o-you">YOU</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Week 2 -->
-      <div class="week-panel" id="wp-w2">
-        <div class="week-header-bar">
-          <div class="wh-num c-gold">W2</div>
-          <div class="wh-info">
-            <div class="wh-tag c-gold">Days 8–14 · Activate the List</div>
-            <div class="wh-title">Win-Back Campaign + Welcome Flow Live</div>
-            <div class="wh-sub">Your 20K list is the fastest source of revenue that requires no new traffic.</div>
-          </div>
-          <div class="wh-target c-gold">+$3–6K<span>from list reactivation</span></div>
-        </div>
-        <div class="task-grid">
-          <div class="task-col">
-            <div class="task-col-label">Win-Back Broadcast</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Segment Klaviyo: inactive 60–180 days</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Broadcast email 1: "We've been working on something" — new product angle</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Broadcast email 2 (3 days later): 20% off or bundle deal offer</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build automated win-back flow for future 60-day inactives</div><div class="owner-tag o-oc">OC</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">Welcome Flow (New Subscribers)</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Email 1: Brand story — founder-led, why MycoLove exists, USDA organic</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Email 2 (Day 2): What makes full-spectrum extraction different</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Email 3 (Day 4): Social proof + 10% off subscription</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Email 4 (Day 7): The Synergistic 4 Set — why stacks outperform singles</div><div class="owner-tag o-ai">AI</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">B2B: Follow Up + Expand</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Follow up on Week 1 outreach — 50% won't reply to first touch</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Identify 10 apothecaries for Tier 1 outreach</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Send apothecary outreach batch (retail tincture line angle)</div><div class="owner-tag o-you">YOU</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Week 3 -->
-      <div class="week-panel" id="wp-w3">
-        <div class="week-header-bar">
-          <div class="wh-num c-gold">W3</div>
-          <div class="wh-info">
-            <div class="wh-tag c-gold">Days 15–21 · Build Retention</div>
-            <div class="wh-title">Post-Purchase Education + Ritual Building</div>
-            <div class="wh-sub">Education = retention for supplements. Make customers feel results.</div>
-          </div>
-          <div class="wh-target c-gold">-1–2%<span>churn reduction target</span></div>
-        </div>
-        <div class="task-grid">
-          <div class="task-col">
-            <div class="task-col-label">Post-Purchase Flow</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Day 3: "How to get the most from Lion's Mane" — dosing, timing, expectations</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Day 14: "What to expect at 2 weeks" — set realistic timeline (4–6 weeks)</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Day 30: "You're 1 month in" — celebrate, introduce Cordyceps stack</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Day 45: Pre-empt save — "Your next shipment is coming, here's what's new"</div><div class="owner-tag o-ai">AI</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">Website CRO</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Audit product pages for top 3 SKUs — add subscription vs one-time comparison</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Add "subscribe and save" callout prominently on product pages</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Add social proof: review count + "X subscribers this month" badge</div><div class="owner-tag o-you">YOU</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">B2B: Close First Deal</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Schedule discovery calls with beverage / bulk extract leads who replied</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Prepare liquid extract sample kit to send to top 3 prospects</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Set up OpenClaw lead tracker: status, last contact, next action per lead</div><div class="owner-tag o-oc">OC</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Week 4 -->
-      <div class="week-panel" id="wp-w4">
-        <div class="week-header-bar">
-          <div class="wh-num c-sage">W4</div>
-          <div class="wh-info">
-            <div class="wh-tag c-sage">Days 22–30 · First Review Point</div>
-            <div class="wh-title">Measure, Adjust, Launch Content Engine</div>
-            <div class="wh-sub">Day 30 checkpoint. Revenue moving → start content. Not moving → double down on B2B.</div>
-          </div>
-          <div class="wh-target c-sage">Review<span>revenue vs target</span></div>
-        </div>
-        <div class="task-grid">
-          <div class="task-col">
-            <div class="task-col-label">Day 30 Metrics Review</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Check failed payment recovery rate (was 33%, target 60%+)</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Check active churn rate (was 5.25%, target 4% or below)</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Check email flow revenue in Klaviyo</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Check B2B deals in progress and estimated close dates</div><div class="owner-tag o-you">YOU</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">Content Engine: Soft Launch</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Write brand_voice.md with Shane — foundation for all AI content</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Set up OpenClaw news scraper: RSS + Reddit + Google News → news.csv</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Send first AI-drafted newsletter to 20K list — test open rate baseline</div><div class="owner-tag o-ai">AI</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">OpenClaw Automation Layer</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Automate: daily scrape → news.csv append (runs 6am daily)</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Automate: Sunday digest generation → notify Shane via email</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Automate: lead scraper for B2B pipeline (apothecaries + beverage brands)</div><div class="owner-tag o-oc">OC</div></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Weeks 5–8 -->
-      <div class="week-panel" id="wp-w5">
-        <div class="week-header-bar">
-          <div class="wh-num c-green">W5–8</div>
-          <div class="wh-info">
-            <div class="wh-tag c-green">Days 31–60 · Scale What's Working</div>
-            <div class="wh-title">Full Engine Running — Close B2B, Scale Email, Grow List</div>
-            <div class="wh-sub">Flows are live, B2B pipeline has warm leads. Double down on what's converting.</div>
-          </div>
-          <div class="wh-target c-green">$40K/mo<span>revenue target</span></div>
-        </div>
-        <div class="task-grid">
-          <div class="task-col">
-            <div class="task-col-label">D2C: Optimize & Scale</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">A/B test subscription save email subject lines</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Add SMS to dunning sequence</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Launch referral program: give 15%, get 15%</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Test messaging: science-forward vs simplified on homepage and email</div><div class="owner-tag o-you">YOU</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">Content Engine: Full Cadence</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Weekly newsletter live every Tuesday (Shane reviews Mondays, 15 min)</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">IG carousel live every Wednesday from same story</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">TikTok script delivered Thursday — team films Friday</div><div class="owner-tag o-ai">AI</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Newsletter story recycled into that week's Klaviyo promo email</div><div class="owner-tag o-oc">OC</div></div>
-          </div>
-          <div class="task-col">
-            <div class="task-col-label">B2B: Close Deals</div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Target: 1 beverage brand deal closed ($5–20K) by Day 45</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Target: 2–3 apothecary accounts closed ($500–1.5K each) by Day 45</div><div class="owner-tag o-you">YOU</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">OpenClaw lead scraper: 50 new tiered leads/week flowing in</div><div class="owner-tag o-oc">OC</div></div>
-            <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build 3-touch follow-up sequence in OpenClaw for all Tier 1 leads</div><div class="owner-tag o-oc">OC</div></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="progress-bar-section">
-        <div>
-          <div class="pb-label">This Week</div>
-          <div class="pb-val" id="wk-done">0</div>
-        </div>
-        <div class="pb-wrap">
-          <div style="display:flex;justify-content:space-between;">
-            <div class="pb-label">Week Progress</div>
-            <div class="pb-pct" id="wk-pct">0% complete</div>
-          </div>
-          <div class="pb-bg"><div class="pb-fill" id="wk-fill" style="width:0%"></div></div>
-        </div>
-        <button class="reset-btn" onclick="resetWeek()">Reset Week</button>
-      </div>
-
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         SECTION 3: 60-DAY CHECKLIST
-    ══════════════════════════════════════════ -->
-    <div class="section" id="sec-sprint">
-
-      <div class="sec-label">Engine 1 · Weeks 1–3</div>
-      <div class="engine-block e1 open" id="eb1">
-        <div class="engine-head" onclick="toggleEngine('eb1')">
-          <div class="engine-num">1</div>
-          <div class="engine-info">
-            <div class="engine-tag">Start Here · Email Revenue Machine</div>
-            <div class="engine-name">Klaviyo Flows + List Activation</div>
-            <div class="engine-why">Your 20K list is sitting idle. Fixing Klaviyo can add $5–8K/mo in 30 days — no new traffic needed.</div>
-          </div>
-          <div class="chevron">▾</div>
-        </div>
-        <div class="engine-body">
-          <div class="engine-inner">
-            <div class="ec">
-              <div class="ec-label">Klaviyo Flows to Build</div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Welcome flow: 3 emails — brand story → product education → first purchase offer</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Abandoned cart: 1hr, 24hr, 72hr sequence with urgency + social proof</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Win-back flow: 60-day inactive trigger → "What happened?" → discount incentive</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Subscription save flow: cancel trigger → value reminder → pause option</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Post-purchase education: Lion's Mane, Cordyceps, Reishi ritual-building sequence</div></div>
-            </div>
-            <div class="ec">
-              <div class="ec-label">List & Conversion</div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Audit existing Klaviyo segments — find who's bought once but not subscribed</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Run a broadcast re-engagement campaign to cold segments (60+ day inactive)</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Add website pop-up: 10% off first subscription order (not one-time)</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Create a lead magnet (mushroom guide PDF) to grow list from IG & TikTok</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Set up review request email 7 days post-delivery</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sec-label">Engine 2 · Weeks 3–7</div>
-      <div class="engine-block e2" id="eb2">
-        <div class="engine-head" onclick="toggleEngine('eb2')">
-          <div class="engine-num">2</div>
-          <div class="engine-info">
-            <div class="engine-tag">Next · MycoLove-Leads Engine</div>
-            <div class="engine-name">B2B Outreach + Pipeline System</div>
-            <div class="engine-why">B2B closes fast and pays big. Apothecaries, mushroom brands, and beverage companies are your highest-value targets.</div>
-          </div>
-          <div class="chevron">▾</div>
-        </div>
-        <div class="engine-body">
-          <div class="engine-inner">
-            <div class="ec">
-              <div class="ec-label">Lead Scraper Setup</div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Define 5 target ICP categories: apothecaries, mushroom brands, herbal beverage, adaptogens, farmers market vendors</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build/run daily scraper → business name, site, email, IG, city, category → new_leads.csv</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Classify leads into Tier 1 / 2 / 3 by fit score</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build deduplication logic against master lead database</div></div>
-            </div>
-            <div class="ec">
-              <div class="ec-label">Outreach Templates</div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Write Tier 1 cold email: personalized angle per business type</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Write IG DM template: short, value-forward, no pitch in first message</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Write private label pitch deck / one-pager for extraction clients</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build 3-touch follow-up sequence (Day 1, Day 4, Day 10)</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Set up simple CRM (Notion or Airtable) to track lead status</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="sec-label">Engine 3 · Weeks 6–10</div>
-      <div class="engine-block e3" id="eb3">
-        <div class="engine-head" onclick="toggleEngine('eb3')">
-          <div class="engine-num">3</div>
-          <div class="engine-info">
-            <div class="engine-tag">Then · MycoLove-News Engine</div>
-            <div class="engine-name">Content + Newsletter Authority</div>
-            <div class="engine-why">Once revenue is stabilizing, this builds the long-term authority moat. Newsletter feeds list growth which feeds everything else.</div>
-          </div>
-          <div class="chevron">▾</div>
-        </div>
-        <div class="engine-body">
-          <div class="engine-inner">
-            <div class="ec">
-              <div class="ec-label">Scraper & Database</div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Define source list: mushroom news sites, Reddit, X/Twitter, Google News RSS</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build daily scraper → news.csv with title, source, URL, summary, category, date</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Weekly digest generator: dedup, rank, top 5–10 stories + 3 insight angles</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Schedule weekly digest to deliver to Shane + team every Monday</div></div>
-            </div>
-            <div class="ec">
-              <div class="ec-label">Newsletter Output</div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Build newsletter generator: digest → subject lines + preview text + polished email body</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Define newsletter cadence and send day (recommend: Thursday)</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Add CTA in each newsletter: product, subscription, or lead magnet</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Repurpose top story into IG carousel or TikTok hook each week</div></div>
-              <div class="task-item" onclick="chk(this)"><div class="task-check">✓</div><div class="task-txt">Track: open rate, click rate, subscriber growth week-over-week</div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div id="at-tasks" style="margin-bottom:16px;background:var(--surface);border:1px solid var(--border);padding:16px 22px;min-height:40px;"></div>
-
-      <div class="progress-bar-section">
-        <div>
-          <div class="pb-label">Tasks Complete</div>
-          <div class="pb-val" id="sp-done">0</div>
-        </div>
-        <div class="pb-wrap">
-          <div style="display:flex;justify-content:space-between;">
-            <div class="pb-label">60-Day Sprint Progress</div>
-            <div class="pb-pct" id="sp-pct">0% complete</div>
-          </div>
-          <div class="pb-bg"><div class="pb-fill" id="sp-fill" style="width:0%"></div></div>
-        </div>
-        <button class="reset-btn" onclick="resetSprint()">Reset Sprint</button>
-      </div>
-
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         SECTION 4: B2B PIPELINE
-    ══════════════════════════════════════════ -->
-    <div class="section" id="sec-b2b">
-
-      <div class="sec-label">Active Hit List — Click Status to Update</div>
-
-      <div style="background:var(--surface);border:1px solid var(--border);margin-bottom:24px;">
-        <div class="pipeline-header">
-          <div>Target</div>
-          <div>Deal Size</div>
-          <div>Close Speed</div>
-          <div>Outreach Angle</div>
-          <div>Priority</div>
-        </div>
-        <div id="at-b2b-pipeline"><div style="padding:20px;color:var(--muted);font-size:11px;">Loading from Airtable...</div></div>
-
-      </div>
-
-      <div style="font-size:10px;color:var(--muted);font-style:italic;margin-bottom:32px;">
-        💡 Click any status badge to cycle: Prospect → Contacted → Warm → Closed
-      </div>
-
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         SECTION 5: REVENUE DASHBOARD
-    ══════════════════════════════════════════ -->
-    <div class="section" id="sec-revenue">
-
-      <div class="sec-label">Key Metrics · <span style="color:var(--sage);font-size:9px;">Live from Airtable</span></div>
-      <div class="rev-dashboard-grid" id="at-revenue-metrics">
-        <div style="padding:20px;color:var(--muted);font-size:11px;grid-column:1/-1;">Loading from Airtable...</div>
-      </div>
-
-      <div class="sec-label">Where Money Is Leaking Right Now</div>
-      <div class="bleed-strip">
-        <div class="bleed-title">Estimated Monthly Revenue Leaking</div>
-        <div class="bleed-row">
-          <div>
-            <div class="bleed-label">Failed payment non-recovery — 67% of failed payments lost</div>
-            <div class="bleed-fix">Fix: OpenClaw dunning sequence → target 65% recovery rate</div>
-          </div>
-          <div class="bleed-num">~$2–4K/mo</div>
-        </div>
-        <div class="bleed-row">
-          <div>
-            <div class="bleed-label">Churn above 3% benchmark — each excess point costs ~$450 per sub lost</div>
-            <div class="bleed-fix">Fix: Subscription save flow + post-purchase ritual building</div>
-          </div>
-          <div class="bleed-num">~$3–6K/mo</div>
-        </div>
-        <div class="bleed-row">
-          <div>
-            <div class="bleed-label">20K email list generating zero automated revenue</div>
-            <div class="bleed-fix">Fix: Welcome + win-back flows (industry avg: $1–3 per subscriber/month)</div>
-          </div>
-          <div class="bleed-num">~$5–10K/mo</div>
-        </div>
-        <div class="bleed-row">
-          <div>
-            <div class="bleed-label">Zero B2B systematic outreach — deals closing by chance not system</div>
-            <div class="bleed-fix">Fix: MycoLove-Leads engine + targeted beverage brand outreach</div>
-          </div>
-          <div class="bleed-num">~$10–50K/deal</div>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ══════════════════════════════════════════
-         SECTION 6: CONTENT CALENDAR
-    ══════════════════════════════════════════ -->
-    <div class="section" id="sec-calendar">
-
-      <div class="cal-legend">
-        <div class="cal-legend-item"><div class="cal-dot" style="background:var(--green);"></div>Email / Klaviyo</div>
-        <div class="cal-legend-item"><div class="cal-dot" style="background:var(--blue);"></div>Social (IG / TikTok)</div>
-        <div class="cal-legend-item"><div class="cal-dot" style="background:var(--gold);"></div>B2B Outreach</div>
-        <div class="cal-legend-item"><div class="cal-dot" style="background:var(--purple);"></div>Content / Newsletter</div>
-      </div>
-
-      <div class="calendar-header">
-        <div class="cal-day-header">Week</div>
-        <div class="cal-day-header">Mon</div>
-        <div class="cal-day-header">Tue</div>
-        <div class="cal-day-header">Wed</div>
-        <div class="cal-day-header">Thu</div>
-        <div class="cal-day-header">Fri</div>
-      </div>
-
-      <div id="at-content-calendar">
-      <div class="cal-week">
-        <div class="cal-week-label">W1</div>
-        <div class="cal-cell">
-          <div class="cal-item cal-b2b">Identify 10 beverage brand prospects</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Write failed payment email seq (3 emails)</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Build subscription save flow (3 emails)</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-b2b">Send 10 personalized IG DMs / cold emails</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Connect OpenClaw → Shopify + Klaviyo</div>
-        </div>
-      </div>
-
-      <div class="cal-week">
-        <div class="cal-week-label">W2</div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Segment Klaviyo: 60–180 day inactives</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Win-back broadcast email 1</div>
-          <div class="cal-item cal-social">IG post: brand story hook</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-b2b">Apothecary outreach batch</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Win-back broadcast email 2 (offer)</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Build welcome flow (4 emails)</div>
-        </div>
-      </div>
-
-      <div class="cal-week">
-        <div class="cal-week-label">W3</div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Post-purchase flow: Day 3, 14, 30, 45 emails</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-social">IG carousel: "What to expect Week 1"</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Website CRO: product page subscription callouts</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-b2b">Discovery calls with warm beverage leads</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-b2b">Send sample kits to top 3 prospects</div>
-        </div>
-      </div>
-
-      <div class="cal-week">
-        <div class="cal-week-label">W4</div>
-        <div class="cal-cell">
-          <div class="cal-item cal-email">Day 30 metrics review — all KPIs</div>
-          <div class="cal-item cal-purple">Write brand_voice.md with Shane</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-purple">First AI-drafted newsletter draft</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-social">IG carousel from newsletter story</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-purple">Newsletter send to 20K list</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-b2b">Set up OpenClaw automation layer</div>
-        </div>
-      </div>
-
-      <div class="cal-week">
-        <div class="cal-week-label">W5–8</div>
-        <div class="cal-cell">
-          <div class="cal-item cal-purple">Shane reviews newsletter (15 min)</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-purple">Newsletter sends to list</div>
-          <div class="cal-item cal-email">Klaviyo promo from newsletter story</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-social">IG carousel goes live</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-social">TikTok script delivered to team</div>
-        </div>
-        <div class="cal-cell">
-          <div class="cal-item cal-social">Team films TikTok</div>
-          <div class="cal-item cal-b2b">B2B follow-ups / closes</div>
-        </div>
-      </div>
-
-      <div style="margin-top:16px;padding:16px 20px;background:var(--surface);border:1px solid var(--border);font-size:10px;color:var(--dim);line-height:1.8;">
-        <strong style="color:var(--sage);">Steady-state weekly rhythm (Weeks 5–8+):</strong> Monday — Shane reviews digest & newsletter draft (15 min).
-        Tuesday — Newsletter sends. Wednesday — IG carousel goes live. Thursday — TikTok script ready.
-        Friday — Team films. OpenClaw handles lead scraping + follow-up sequences automatically.
-      </div>
-
-    </div>
-
-  </main>
-</div>
-
-<script>
-  // Spore particle background
-  const canvas = document.getElementById('spores');
-  const ctx = canvas.getContext('2d');
-  let particles = [];
-
-  function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-
-  for (let i = 0; i < 50; i++) {
-    particles.push({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      r: Math.random() * 1.8 + 0.4,
-      vx: (Math.random() - 0.5) * 0.25,
-      vy: (Math.random() - 0.5) * 0.25 - 0.08,
-      opacity: Math.random() * 0.4 + 0.1
-    });
-  }
-
-  function animateSpores() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    particles.forEach(p => {
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(109,184,107,${p.opacity})`;
-      ctx.fill();
-      p.x += p.vx; p.y += p.vy;
-      if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
-      if (p.x < -10) p.x = canvas.width + 10;
-      if (p.x > canvas.width + 10) p.x = -10;
-    });
-    requestAnimationFrame(animateSpores);
-  }
-  animateSpores();
-
-  // Navigation
-  const sectionMeta = {
-    'overview': ['Dashboard', 'Overview of all systems · MycoLove 60-Day Sprint'],
-    'weekly': ['Weekly To-Dos', 'Current week tasks by owner — YOU / AI / OpenClaw'],
-    'sprint': ['60-Day Checklist', 'Full engine build order — all 3 systems'],
-    'b2b': ['B2B Pipeline', 'Active targets, deal sizes, status tracking'],
-    'revenue': ['Revenue Dashboard', 'Key metrics and where money is leaking'],
-    'calendar': ['Content Calendar', 'Weekly cadence — email, social, B2B, content'],
-  };
-
-  function showSection(id, navEl) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.getElementById('sec-' + id).classList.add('active');
-    navEl.classList.add('active');
-    const meta = sectionMeta[id];
-    document.getElementById('section-title').textContent = meta[0];
-    document.getElementById('section-meta').textContent = meta[1];
-  }
-
-  // Week tabs
-  function showWeek(id, btn) {
-    document.querySelectorAll('.week-panel').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.week-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('wp-' + id).classList.add('active');
-    btn.classList.add('active');
-    updateWeekProgress();
-  }
-
-  // Engine accordion
-  function toggleEngine(id) {
-    document.getElementById(id).classList.toggle('open');
-  }
-
-  // Task checking
-  function chk(el) {
-    el.classList.toggle('done');
-    updateAllProgress();
-  }
-
-  // Weekly progress
-  function updateWeekProgress() {
-    const activePanel = document.querySelector('.week-panel.active');
-    if (!activePanel) return;
-    const all = activePanel.querySelectorAll('.task-item');
-    const done = activePanel.querySelectorAll('.task-item.done');
-    const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
-    document.getElementById('wk-done').textContent = done.length;
-    document.getElementById('wk-pct').textContent = pct + '% complete';
-    document.getElementById('wk-fill').style.width = pct + '%';
-  }
-
-  function resetWeek() {
-    const activePanel = document.querySelector('.week-panel.active');
-    if (!activePanel) return;
-    activePanel.querySelectorAll('.task-item.done').forEach(t => t.classList.remove('done'));
-    updateAllProgress();
-  }
-
-  // Sprint progress
-  function updateSprintProgress() {
-    const all = document.querySelectorAll('#sec-sprint .task-item');
-    const done = document.querySelectorAll('#sec-sprint .task-item.done');
-    const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
-    document.getElementById('sp-done').textContent = done.length;
-    document.getElementById('sp-pct').textContent = pct + '% complete';
-    document.getElementById('sp-fill').style.width = pct + '%';
-  }
-
-  function resetSprint() {
-    document.querySelectorAll('#sec-sprint .task-item.done').forEach(t => t.classList.remove('done'));
-    updateAllProgress();
-  }
-
-  // Sidebar global progress
-  function updateSidebarProgress() {
-    const all = document.querySelectorAll('.task-item, .task');
-    const done = document.querySelectorAll('.task-item.done, .task.done');
-    const pct = all.length ? Math.round(done.length / all.length * 100) : 0;
-    document.getElementById('sidebar-pct').textContent = pct + '% complete';
-    document.getElementById('sidebar-fill').style.width = pct + '%';
-  }
-
-  function updateAllProgress() {
-    updateWeekProgress();
-    updateSprintProgress();
-    updateSidebarProgress();
-  }
-
-  // B2B status cycle
-  const statusCycle = [
-    { cls: 's-prospect', label: '● Prospect' },
-    { cls: 's-contacted', label: '● Contacted' },
-    { cls: 's-warm', label: '● Warm' },
-    { cls: 's-closed', label: '● Closed' },
-  ];
-
-  function cycleStatus(el) {
-    const current = statusCycle.findIndex(s => el.classList.contains(s.cls));
-    const next = (current + 1) % statusCycle.length;
-    statusCycle.forEach(s => el.classList.remove(s.cls));
-    el.classList.add(statusCycle[next].cls);
-    el.textContent = statusCycle[next].label;
-  }
-
-  // Init
-  updateAllProgress();
-
-  // ── AIRTABLE INTEGRATION ──
-  const AT_BASE = 'appxpUFIzUwdCIrL4';
-
-  function getToken() { return localStorage.getItem('mycolove_at_token') || ''; }
-  function getHeaders() { return { 'Authorization': `Bearer ${getToken()}`, 'Content-Type': 'application/json' }; }
-  function getUrl() { return `https://api.airtable.com/v0/${AT_BASE}`; }
-
-  function showSetupScreen() { document.getElementById('setup-overlay').style.display = 'flex'; }
-  function hideSetupScreen() { document.getElementById('setup-overlay').style.display = 'none'; }
-
-  function saveToken() {
-    const input = document.getElementById('token-input').value.trim();
-    if (!input.startsWith('pat')) {
-      document.getElementById('token-error').textContent = 'Token should start with "pat" — check and try again.';
-      return;
-    }
-    localStorage.setItem('mycolove_at_token', input);
-    hideSetupScreen();
-    initAirtable();
-  }
-
-  function resetToken() { localStorage.removeItem('mycolove_at_token'); showSetupScreen(); }
-
-  async function atFetch(table) {
-    try {
-      let allRecords = [];
-      let offset = null;
-      do {
-        const url = `${getUrl()}/${encodeURIComponent(table)}?pageSize=100${offset ? '&offset=' + offset : ''}`;
-        const res = await fetch(url, { headers: getHeaders() });
-        const data = await res.json();
-        if (data.records) allRecords = allRecords.concat(data.records);
-        offset = data.offset || null;
-      } while (offset);
-      return allRecords;
-    } catch(e) { console.error('Airtable fetch error:', e); return []; }
-  }
-
-  async function atPatch(table, recordId, fields) {
-    try {
-      await fetch(`${getUrl()}/${encodeURIComponent(table)}/${recordId}`, {
-        method: 'PATCH',
-        headers: getHeaders(),
-        body: JSON.stringify({ fields })
-      });
-    } catch(e) { console.error('Airtable patch error:', e); }
-  }
-
-  async function atCreate(table, fields) {
-    try {
-      const res = await fetch(`${getUrl()}/${encodeURIComponent(table)}`, {
-        method: 'POST',
-        headers: getHeaders(),
-        body: JSON.stringify({ fields })
-      });
-      return await res.json();
-    } catch(e) { console.error('Airtable create error:', e); }
-  }
-
-  // ── LOAD REVENUE METRICS ──
-  async function loadRevenueMetrics() {
-    const records = await atFetch('Revenue Metrics');
-    if (!records.length) return;
-    const container = document.getElementById('at-revenue-metrics');
-    if (!container) return;
-    container.innerHTML = '';
-    const statusColors = { 'On Track': 'var(--green)', 'At Risk': 'var(--gold)', 'Behind': 'var(--rust)', 'Achieved': 'var(--sage)' };
-    const statusWidths = { 'On Track': '70%', 'At Risk': '45%', 'Behind': '25%', 'Achieved': '100%' };
-    records.forEach(r => {
-      const f = r.fields;
-      const color = statusColors[f.Status] || 'var(--muted)';
-      const width = statusWidths[f.Status] || '30%';
-      container.innerHTML += `
-        <div class="rev-metric">
-          <div class="rm-label">${f.Metric || ''}</div>
-          <div class="rm-val" style="color:${color}">${f['Current Value'] || '—'}</div>
-          <div class="rm-target">Target: ${f.Target || '—'} ${f.Notes ? '· ' + f.Notes : ''}</div>
-          <div class="rm-bar"><div class="rm-fill" style="width:${width};background:${color};"></div></div>
-        </div>`;
-    });
-  }
-
-  // ── LOAD B2B PIPELINE ──
-  async function loadB2BPipeline() {
-    const records = await atFetch('B2B Pipeline');
-    if (!records.length) return;
-    const container = document.getElementById('at-b2b-pipeline');
-    if (!container) return;
-    container.innerHTML = '';
-    const statusMap = {
-      'Prospect':  { cls: 's-prospect',  label: '● Prospect' },
-      'Contacted': { cls: 's-contacted', label: '● Contacted' },
-      'Warm':      { cls: 's-warm',      label: '● Warm' },
-      'Closed':    { cls: 's-closed',    label: '● Closed' },
-    };
-    const priorityMap = { 'P1': 'pp1', 'P2': 'pp2', 'P3': 'pp3' };
-
-    records.forEach(r => {
-      const f = r.fields;
-      const st = statusMap[f.Status] || statusMap['Prospect'];
-      const pc = priorityMap[f.Priority] || 'pp3';
-      container.innerHTML += `
-        <div class="pipeline-row" data-id="${r.id}">
-          <div>
-            <span class="p-name">${f.Company || 'Unnamed'}</span>
-            <span class="p-sub">${f.Category || ''}</span>
-            <div style="margin-top:6px;">
-              <span class="status-dot ${st.cls}" onclick="cycleStatusAt(this, '${r.id}')">${st.label}</span>
-            </div>
-          </div>
-          <div><div class="p-deal">${f['Deal Size'] || '—'}</div></div>
-          <div><div style="font-size:11px;color:var(--dim);">${f['Close Speed'] || '—'}</div></div>
-          <div>
-            <div style="font-size:10px;color:var(--dim);">${f['Outreach Angle'] || ''}</div>
-            <input class="edit-note" placeholder="Add note..." value="${f.Notes || ''}"
-              onblur="saveNote('${r.id}', this.value)" />
-          </div>
-          <div><span class="p-priority ${pc}">${f.Priority || 'P3'}</span></div>
-        </div>`;
-    });
-  }
-
-  // ── LOAD TASKS ──
-  async function loadTasks() {
-    const records = await atFetch('Tasks');
-    if (!records.length) return;
-    const container = document.getElementById('at-tasks');
-    if (!container) return;
-    container.innerHTML = '';
-    const ownerColors = { 'Shane': 'o-you', 'AI': 'o-ai', 'OpenClaw': 'o-oc', 'Shane + AI': 'o-you' };
-    const grouped = {};
-    records.forEach(r => {
-      const w = r.fields.Week || 'W1';
-      if (!grouped[w]) grouped[w] = [];
-      grouped[w].push(r);
-    });
-    Object.keys(grouped).sort().forEach(week => {
-      container.innerHTML += `<div style="margin-bottom:8px;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);padding:8px 0 4px;border-bottom:1px solid var(--border);">${week}</div>`;
-      grouped[week].forEach(r => {
-        const f = r.fields;
-        const done = f.Status === 'Done';
-        const oc = ownerColors[f.Owner] || 'o-you';
-        container.innerHTML += `
-          <div class="task-item ${done ? 'done' : ''}" onclick="toggleTaskAt(this, '${r.id}')">
-            <div class="task-check">✓</div>
-            <div class="task-txt">${f.Task || ''}</div>
-            <div class="owner-tag ${oc}">${f.Owner || 'Shane'}</div>
-          </div>`;
-      });
-    });
-  }
-
-  // ── LOAD CONTENT CALENDAR ──
-  async function loadContentCalendar() {
-    const records = await atFetch('Content Calendar');
-    if (!records.length) return;
-    const container = document.getElementById('at-content-calendar');
-    if (!container) return;
-    const typeClass = {
-      'Email / Klaviyo': 'cal-email',
-      'IG Post': 'cal-social', 'IG Carousel': 'cal-social',
-      'TikTok Script': 'cal-social',
-      'Newsletter': 'cal-content',
-      'B2B Outreach': 'cal-b2b'
-    };
-    const days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
-    const weeks = ['W1','W2','W3','W4','W5-8'];
-    let html = '';
-    weeks.forEach(week => {
-      html += `<div class="cal-week"><div class="cal-week-label">${week}</div>`;
-      days.forEach(day => {
-        const items = records.filter(r => r.fields.Week === week && r.fields.Day === day);
-        html += `<div class="cal-cell">`;
-        if (items.length) {
-          items.forEach(r => {
-            const tc = typeClass[r.fields.Type] || 'cal-content';
-            html += `<div class="cal-item ${tc}">${r.fields['Content Title'] || r.fields.Type}</div>`;
-          });
-        } else {
-          html += `<span class="cal-empty">—</span>`;
-        }
-        html += `</div>`;
-      });
-      html += `</div>`;
-    });
-    container.innerHTML = html;
-  }
-
-  // ── WRITE BACK: Status cycle with Airtable sync ──
-  async function cycleStatusAt(el, recordId) {
-    const current = statusCycle.findIndex(s => el.classList.contains(s.cls));
-    const next = (current + 1) % statusCycle.length;
-    statusCycle.forEach(s => el.classList.remove(s.cls));
-    el.classList.add(statusCycle[next].cls);
-    el.textContent = statusCycle[next].label;
-    const statusLabel = statusCycle[next].label.replace('● ', '');
-    await atPatch('B2B Pipeline', recordId, { Status: statusLabel });
-  }
-
-  // ── WRITE BACK: Notes ──
-  async function saveNote(recordId, value) {
-    await atPatch('B2B Pipeline', recordId, { Notes: value });
-  }
-
-  // ── WRITE BACK: Task toggle ──
-  async function toggleTaskAt(el, recordId) {
-    el.classList.toggle('done');
-    const isDone = el.classList.contains('done');
-    await atPatch('Tasks', recordId, { Status: isDone ? 'Done' : 'Not Started' });
-    updateAllProgress();
-  }
-
-  // ── SYNC INDICATOR ──
-  function showSyncStatus(msg, color) {
-    let el = document.getElementById('sync-status');
-    if (!el) {
-      el = document.createElement('div');
-      el.id = 'sync-status';
-      el.style.cssText = 'position:fixed;bottom:20px;right:20px;padding:8px 16px;border-radius:2px;font-size:10px;letter-spacing:0.1em;z-index:999;transition:opacity 0.5s;font-family:Syne Mono,monospace;';
-      document.body.appendChild(el);
-    }
-    el.style.background = color || 'var(--surface2)';
-    el.style.border = `1px solid ${color || 'var(--border)'}`;
-    el.style.color = 'var(--text)';
-    el.style.opacity = '1';
-    el.textContent = msg;
-    setTimeout(() => { el.style.opacity = '0'; }, 3000);
-  }
-
-  // ── INIT: Load all Airtable data ──
-  async function initAirtable() {
-    if (!getToken()) { showSetupScreen(); return; }
-    showSyncStatus('🍄 Syncing with Airtable...', 'var(--border)');
-    await Promise.all([
-      loadRevenueMetrics(),
-      loadB2BPipeline(),
-      loadTasks(),
-      loadContentCalendar()
-    ]);
-    showSyncStatus('✓ Synced with Airtable', 'var(--sage)');
-    updateAllProgress();
-  }
-
-  initAirtable();
-</script>
-
-
-<!-- ── SETUP OVERLAY ── -->
-<div id="setup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,13,8,0.95);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:var(--surface);border:1px solid var(--border);padding:40px;max-width:480px;width:90%;border-left:3px solid var(--sage);">
-    <div style="font-family:'Cormorant Garamond',serif;font-size:9px;font-style:italic;letter-spacing:0.3em;color:var(--sage);text-transform:uppercase;margin-bottom:12px;">🍄 MycoLove</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--text);margin-bottom:8px;">Connect <em style="font-style:italic;color:var(--sage);">Airtable</em></div>
-    <div style="font-size:11px;color:var(--dim);margin-bottom:28px;line-height:1.7;">Enter your Airtable Personal Access Token to connect Mission Control to your live data. This is stored only in your browser — never on GitHub or any server.</div>
-    <div style="font-size:9px;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">Personal Access Token</div>
-    <input id="token-input" type="password" placeholder="patXXXXXXXXXXXXXX..." style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Syne Mono',monospace;font-size:11px;padding:12px 14px;outline:none;margin-bottom:8px;" onkeydown="if(event.key==='Enter')saveToken()" />
-    <div id="token-error" style="font-size:10px;color:var(--rust);min-height:16px;margin-bottom:16px;"></div>
-    <button onclick="saveToken()" style="width:100%;background:var(--sage);border:none;color:var(--bg);font-family:'Syne Mono',monospace;font-size:11px;letter-spacing:0.1em;padding:12px;cursor:pointer;text-transform:uppercase;">Connect Mission Control</button>
-    <div style="margin-top:16px;font-size:10px;color:var(--muted);line-height:1.6;">
-      Get your token at <span style="color:var(--sage);">airtable.com → Developer Hub → Personal Access Tokens</span><br>
-      Scopes needed: <span style="color:var(--dim);">data.records:read · data.records:write · schema.bases:read</span>
-    </div>
+<div id="setup-overlay">
+  <div class="setup-box">
+    <div class="setup-title">Connect <em>Airtable</em></div>
+    <div class="setup-sub">Enter your Airtable Personal Access Token to connect Mission Control to your live data. Stored only in your browser — never on GitHub.</div>
+    <input class="setup-input" id="token-input" type="password" placeholder="pat...">
+    <div class="setup-error" id="token-error"></div>
+    <button class="setup-btn" onclick="saveToken()">Connect Mission Control</button>
+    <div class="setup-hint">Get your token at airtable.com → Developer Hub → Personal Access Tokens<br>Scopes needed: data.records:read · data.records:write · schema.bases:read</div>
   </div>
 </div>
 
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-brand">🍄 Myco<em>Love</em></div>
+    <div class="sidebar-sub">Mission Control</div>
+  </div>
+  <div class="sidebar-target">
+    <div class="sidebar-target-label">60-Day Target</div>
+    <div class="sidebar-target-val">$40K</div>
+    <div class="sidebar-target-sub">D2C + B2B / month</div>
+  </div>
+  <div class="sidebar-progress">
+    <div class="prog-label">Sprint Progress</div>
+    <div class="prog-bar-bg"><div class="prog-bar-fill" id="sidebar-prog" style="width:0%"></div></div>
+    <div class="prog-pct" id="sidebar-pct">0% complete</div>
+  </div>
+  <nav>
+    <div class="nav-section">Overview</div>
+    <div class="nav-item active" data-page="dashboard" onclick="showPage('dashboard',this)"><span class="nav-icon">🌐</span> Dashboard</div>
+    <div class="nav-section">Execution</div>
+    <div class="nav-item" data-page="tasks" onclick="showPage('tasks',this)"><span class="nav-icon">📅</span> Weekly To-Dos</div>
+    <div class="nav-section">Pipeline</div>
+    <div class="nav-item" data-page="pipeline" onclick="showPage('pipeline',this)"><span class="nav-icon">🤝</span> B2B Pipeline</div>
+    <div class="nav-item" data-page="revenue" onclick="showPage('revenue',this)"><span class="nav-icon">📊</span> Revenue Dashboard</div>
+    <div class="nav-section">Content</div>
+    <div class="nav-item" data-page="calendar" onclick="showPage('calendar',this)"><span class="nav-icon">📰</span> Content Calendar</div>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="reset-token-btn" onclick="resetToken()">⚙ Reset Airtable Token</button>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- DASHBOARD -->
+  <div class="page active" id="page-dashboard">
+    <div class="page-header">
+      <div class="page-eyebrow">Overview · MycoLove 60-Day Sprint</div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-subtitle">Overview of all systems · D2C ~$20K now → Target $40K/mo</div>
+    </div>
+    <div class="sec">Current Situation</div>
+    <div class="stat-grid">
+      <div class="stat-item"><div class="stat-label">D2C Revenue</div><div class="stat-val bad">~$20K</div><div class="stat-note">Declining · stabilize first</div></div>
+      <div class="stat-item"><div class="stat-label">B2B Revenue</div><div class="stat-val warn">Inconsistent</div><div class="stat-note">Target: $20K/mo</div></div>
+      <div class="stat-item"><div class="stat-label">Email List</div><div class="stat-val" style="color:var(--gold)">20K</div><div class="stat-note">Underutilized asset</div></div>
+      <div class="stat-item"><div class="stat-label">Active Churn</div><div class="stat-val bad">5.25%</div><div class="stat-note">Target: under 3%</div></div>
+      <div class="stat-item"><div class="stat-label">Failed Payment Recovery</div><div class="stat-val warn">33%</div><div class="stat-note">Industry avg: 60–70%</div></div>
+      <div class="stat-item"><div class="stat-label">Avg Sub LTV</div><div class="stat-val good">$452</div><div class="stat-note">Strong — protect every sub</div></div>
+      <div class="stat-item"><div class="stat-label">IG Followers</div><div class="stat-val good">12K</div><div class="stat-note">+ 2K TikTok</div></div>
+      <div class="stat-item"><div class="stat-label">B2B Opportunity</div><div class="stat-val oppty">$50K+</div><div class="stat-note">Per beverage deal possible</div></div>
+    </div>
+    <div class="sec">Revenue Path to $40K/Month</div>
+    <div class="rev-grid">
+      <div class="rev-row"><div class="rev-label">D2C Subscriptions</div><div class="rev-bar-bg"><div class="rev-bar" style="width:50%;background:var(--rust);">Current ~$20K</div></div><div class="rev-amt" style="color:var(--gold);">→ $25K</div></div>
+      <div class="rev-row"><div class="rev-label">Email Flows</div><div class="rev-bar-bg"><div class="rev-bar" style="width:3%;background:var(--gold);"></div></div><div class="rev-amt" style="color:var(--gold);">→ $5K</div></div>
+      <div class="rev-row"><div class="rev-label">B2B Liquid Extract</div><div class="rev-bar-bg"><div class="rev-bar" style="width:20%;background:var(--blue);">Inconsistent</div></div><div class="rev-amt" style="color:var(--green);">→ $10K</div></div>
+      <div class="rev-row"><div class="rev-label">Total Target</div><div class="rev-bar-bg"><div class="rev-bar" style="width:78%;background:linear-gradient(90deg,var(--rust),var(--green));">60-Day Goal</div></div><div class="rev-amt" style="color:var(--green);font-size:20px;">$40K</div></div>
+    </div>
+    <div class="sec">How The Three Engines Connect</div>
+    <div class="flow">
+      <div class="flow-node"><div class="flow-node-icon">📧</div><div class="flow-node-name">Email Machine</div><div class="flow-node-sub">Stabilizes D2C</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="flow-node-icon">🤝</div><div class="flow-node-name">Leads Engine</div><div class="flow-node-sub">Builds B2B</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node"><div class="flow-node-icon">📰</div><div class="flow-node-name">News Engine</div><div class="flow-node-sub">Fuels Authority</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="border-color:var(--sage);background:rgba(122,158,110,0.05)"><div class="flow-node-icon">🌐</div><div class="flow-node-name">Mycelial Network</div><div class="flow-node-sub">Self-sustaining</div></div>
+    </div>
+    <div class="sec">Where Money Is Leaking Right Now</div>
+    <div class="bleed-box">
+      <h3>Estimated Monthly Revenue Leaking</h3>
+      <div class="bleed-row"><div><div class="bleed-label">Failed payment non-recovery — 67% of failed payments lost</div><div class="bleed-fix">Fix: Myco dunning sequence → target 65% recovery rate</div></div><div class="bleed-num">~$2–4K/mo</div></div>
+      <div class="bleed-row"><div><div class="bleed-label">Churn above 3% benchmark — each excess point costs ~$450 per sub lost</div><div class="bleed-fix">Fix: Subscription save flow + post-purchase ritual building</div></div><div class="bleed-num">~$3–6K/mo</div></div>
+      <div class="bleed-row"><div><div class="bleed-label">20K email list generating zero automated revenue</div><div class="bleed-fix">Fix: Welcome + win-back flows (industry avg: $1–3 per subscriber/month)</div></div><div class="bleed-num">~$5–10K/mo</div></div>
+      <div class="bleed-row"><div><div class="bleed-label">Zero B2B systematic outreach — deals closing by chance not system</div><div class="bleed-fix">Fix: MycoLove-Leads engine + targeted beverage brand outreach</div></div><div class="bleed-num">~$10–50K/deal</div></div>
+    </div>
+  </div>
+
+  <!-- WEEKLY TO-DOS -->
+  <div class="page" id="page-tasks">
+    <div class="page-header">
+      <div class="page-eyebrow">Execution · Live from Airtable</div>
+      <div class="page-title">Weekly <em>To-Dos</em></div>
+      <div class="page-subtitle">Click any task to mark done. Changes save to Airtable instantly and sync across all devices.</div>
+    </div>
+    <div class="week-tabs">
+      <button class="week-tab active" onclick="setWeek('W1',this)">Week 1</button>
+      <button class="week-tab" onclick="setWeek('W2',this)">Week 2</button>
+      <button class="week-tab" onclick="setWeek('W3',this)">Week 3</button>
+      <button class="week-tab" onclick="setWeek('W4',this)">Week 4</button>
+      <button class="week-tab" onclick="setWeek('W5-8',this)">Weeks 5–8</button>
+    </div>
+    <div class="tasks-header">
+      <div>
+        <div class="tasks-week-title" id="week-title">Week 1 — Stop the Bleed</div>
+        <div class="tasks-week-sub" id="week-sub">Days 1–7 · Fix Failed Payments + Launch Subscription Save</div>
+      </div>
+      <div class="week-stats">
+        <div class="week-stat"><strong id="week-done">0</strong> done</div>
+        <div class="week-stat"><strong id="week-total">0</strong> total</div>
+      </div>
+    </div>
+    <div id="tasks-container"><div class="loading-state"><span class="spin">⟳</span> Loading tasks from Airtable...</div></div>
+  </div>
+
+  <!-- B2B PIPELINE -->
+  <div class="page" id="page-pipeline">
+    <div class="page-header">
+      <div class="page-eyebrow">Pipeline · Live from Airtable</div>
+      <div class="page-title">B2B <em>Pipeline</em></div>
+      <div class="page-subtitle">Click any status badge to cycle through stages. Updates save instantly to Airtable.</div>
+    </div>
+    <div id="pipeline-container"><div class="loading-state"><span class="spin">⟳</span> Loading pipeline from Airtable...</div></div>
+  </div>
+
+  <!-- REVENUE DASHBOARD -->
+  <div class="page" id="page-revenue">
+    <div class="page-header">
+      <div class="page-eyebrow">Metrics · Live from Airtable</div>
+      <div class="page-title">Revenue <em>Dashboard</em></div>
+      <div class="page-subtitle">Key metrics tracked against 60-day targets. Update values directly in Airtable.</div>
+    </div>
+    <div id="metrics-container"><div class="loading-state"><span class="spin">⟳</span> Loading metrics from Airtable...</div></div>
+  </div>
+
+  <!-- CONTENT CALENDAR -->
+  <div class="page" id="page-calendar">
+    <div class="page-header">
+      <div class="page-eyebrow">Content · Weekly Rhythm</div>
+      <div class="page-title">Content <em>Calendar</em></div>
+      <div class="page-subtitle">Steady-state weekly cadence once engines are running (Weeks 5–8+).</div>
+    </div>
+    <div class="cal-grid">
+      <div class="cal-cell cal-header"></div>
+      <div class="cal-cell cal-header">Monday</div>
+      <div class="cal-cell cal-header">Tuesday</div>
+      <div class="cal-cell cal-header">Wednesday</div>
+      <div class="cal-cell cal-header">Thursday</div>
+      <div class="cal-cell cal-header">Friday</div>
+      <div class="cal-cell cal-week">W1</div>
+      <div class="cal-cell cal-task">Identify 10 beverage brand prospects<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Write failed payment email seq (3 emails)<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">Build subscription save flow (3 emails)<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">Send 10 personalized IG DMs / cold emails<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Connect Myco to Shopify + Klaviyo<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-week">W2</div>
+      <div class="cal-cell cal-task">Segment Klaviyo: 60–180 day inactives<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Win-back broadcast email 1<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">IG post: brand story hook<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Apothecary outreach batch<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Win-back broadcast email 2 (offer)<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-week">W3</div>
+      <div class="cal-cell cal-task">Post-purchase flow: Day 3, 14, 30, 45<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">IG carousel: What to expect Week 1<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Website CRO: subscription callouts<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Discovery calls with warm beverage leads<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Send sample kits to top 3 prospects<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-week">W4</div>
+      <div class="cal-cell cal-task">Day 30 metrics review — all KPIs<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Write brand_voice.md with Shane<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">First AI-drafted newsletter draft<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">IG carousel from newsletter story<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Newsletter send to 20K list<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-week">W5–8</div>
+      <div class="cal-cell cal-task">Shane reviews digest and newsletter (15 min)<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+      <div class="cal-cell cal-task">Newsletter sends to list<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">IG carousel goes live<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">TikTok script ready for team<div class="cal-task-owner" style="color:var(--blue)">AI</div></div>
+      <div class="cal-cell cal-task">Team films TikTok / B2B follow-ups<div class="cal-task-owner" style="color:var(--gold)">Shane</div></div>
+    </div>
+    <div style="font-size:10px;color:var(--muted);line-height:1.8;border-top:1px solid var(--border);padding-top:16px;">
+      <strong style="color:var(--dim)">Steady-state weekly rhythm (Weeks 5–8+):</strong> Monday — Shane reviews digest and newsletter draft (15 min).
+      Tuesday — Newsletter sends. Wednesday — IG carousel goes live. Thursday — TikTok script ready.
+      Friday — Team films. Myco handles lead scraping and follow-up sequences automatically.
+    </div>
+  </div>
+
+</div>
+
+<script>
+const AT_BASE = 'appxpUFIzUwdCIrL4';
+function getToken(){ return localStorage.getItem('mycolove_at_token')||''; }
+function getHeaders(){ return {'Authorization':'Bearer '+getToken(),'Content-Type':'application/json'}; }
+function atUrl(t){ return 'https://api.airtable.com/v0/'+AT_BASE+'/'+encodeURIComponent(t); }
+
+// Token setup
+function showSetup(){ document.getElementById('setup-overlay').style.display='flex'; }
+function hideSetup(){ document.getElementById('setup-overlay').style.display='none'; }
+function resetToken(){ localStorage.removeItem('mycolove_at_token'); location.reload(); }
+
+async function saveToken(){
+  const val = document.getElementById('token-input').value.trim();
+  const err = document.getElementById('token-error');
+  if(!val.startsWith('pat')){ err.textContent='Token should start with "pat" — check and try again.'; return; }
+  err.textContent='Connecting...';
+  try{
+    const res = await fetch(atUrl('Tasks')+'?maxRecords=1',{headers:{'Authorization':'Bearer '+val}});
+    if(!res.ok){ err.textContent='Could not connect — check your token and try again.'; return; }
+    localStorage.setItem('mycolove_at_token',val);
+    hideSetup();
+    initApp();
+  } catch(e){ err.textContent='Connection failed — check your internet and token.'; }
+}
+
+// Fetch with pagination
+async function atFetch(table, params=''){
+  let all=[], offset=null;
+  do {
+    let url = atUrl(table)+'?pageSize=100'+(params?'&'+params:'')+(offset?'&offset='+offset:'');
+    const res = await fetch(url,{headers:getHeaders()});
+    const data = await res.json();
+    if(data.error){ console.error('AT error:',data.error); return []; }
+    if(data.records) all=all.concat(data.records);
+    offset = data.offset||null;
+  } while(offset);
+  return all;
+}
+
+async function atUpdate(table, id, fields){
+  return fetch(atUrl(table)+'/'+id,{method:'PATCH',headers:getHeaders(),body:JSON.stringify({fields})});
+}
+
+// Navigation
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  if(el) el.classList.add('active');
+  if(id==='tasks') loadTasks();
+  if(id==='pipeline') loadPipeline();
+  if(id==='revenue') loadMetrics();
+}
+
+// Week meta
+const weekMeta = {
+  'W1':{title:'Week 1 — Stop the Bleed',sub:'Days 1–7 · Fix Failed Payments + Launch Subscription Save'},
+  'W2':{title:'Week 2 — Activate the List',sub:'Days 8–14 · Win-Back Campaign + Welcome Flow Live'},
+  'W3':{title:'Week 3 — Build Retention',sub:'Days 15–21 · Post-Purchase Education + Ritual Building'},
+  'W4':{title:'Week 4 — First Review Point',sub:'Days 22–30 · Measure, Adjust, Launch Content Engine'},
+  'W5-8':{title:'Weeks 5–8 — Scale What\'s Working',sub:'Days 31–60 · Full Engine Running — Close B2B, Scale Email, Grow List'},
+};
+
+let allTasks=[], currentWeek='W1';
+
+function setWeek(week, btn){
+  currentWeek=week;
+  document.querySelectorAll('.week-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const m=weekMeta[week]||{};
+  document.getElementById('week-title').textContent=m.title||week;
+  document.getElementById('week-sub').textContent=m.sub||'';
+  renderWeekTasks();
+}
+
+function engineClass(e){
+  if(!e) return 'engine-tag-general';
+  if(e.includes('Email')) return 'engine-tag-email';
+  if(e.includes('Leads')) return 'engine-tag-leads';
+  if(e.includes('News')) return 'engine-tag-news';
+  return 'engine-tag-general';
+}
+function ownerClass(o){
+  if(!o||o==='Shane') return 'owner-shane';
+  if(o==='Myco') return 'owner-myco';
+  if(o==='AI') return 'owner-ai';
+  if(o.includes('+')) return 'owner-shaneai';
+  return 'owner-shane';
+}
+function priorityClass(p){
+  if(p==='High') return 'p-high';
+  if(p==='Medium') return 'p-med';
+  return 'p-low';
+}
+
+// Tasks
+async function loadTasks(){
+  if(allTasks.length===0){
+    document.getElementById('tasks-container').innerHTML='<div class="loading-state"><span class="spin">⟳</span> Loading tasks from Airtable...</div>';
+    allTasks = await atFetch('Tasks');
+    updateProgress();
+  }
+  renderWeekTasks();
+}
+
+function renderWeekTasks(){
+  const weekTasks = allTasks.filter(r=>r.fields.Week===currentWeek);
+  const container = document.getElementById('tasks-container');
+  if(!weekTasks.length){ container.innerHTML='<div class="loading-state">No tasks found for this week.</div>'; return; }
+
+  // Group by engine
+  const engines={};
+  weekTasks.forEach(r=>{
+    const eng=r.fields.Engine||'General';
+    if(!engines[eng]) engines[eng]=[];
+    engines[eng].push(r);
+  });
+
+  const done=weekTasks.filter(r=>r.fields.Status==='Done').length;
+  document.getElementById('week-done').textContent=done;
+  document.getElementById('week-total').textContent=weekTasks.length;
+
+  let html='';
+  Object.entries(engines).forEach(([eng,tasks])=>{
+    const engDone=tasks.filter(r=>r.fields.Status==='Done').length;
+    html+=`<div class="engine-group">
+      <div class="engine-group-header">
+        <div class="engine-group-name ${engineClass(eng)}">${eng}</div>
+        <div class="engine-group-count">${engDone}/${tasks.length} done</div>
+      </div>`;
+    tasks.forEach(r=>{
+      const f=r.fields, isDone=f.Status==='Done';
+      html+=`<div class="task-row${isDone?' done':''}" onclick="toggleTask('${r.id}',this)">
+        <div class="task-priority ${priorityClass(f.Priority)}"></div>
+        <div class="task-check">✓</div>
+        <div class="task-text">${f.Task||'(no title)'}</div>
+        <div class="task-owner ${ownerClass(f.Owner)}">${f.Owner||'Shane'}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+  container.innerHTML=html;
+}
+
+async function toggleTask(id, el){
+  const isDone=el.classList.contains('done');
+  const newStatus=isDone?'Not Started':'Done';
+  el.classList.toggle('done');
+  const rec=allTasks.find(r=>r.id===id);
+  if(rec) rec.fields.Status=newStatus;
+
+  // Update week counts
+  const weekTasks=allTasks.filter(r=>r.fields.Week===currentWeek);
+  const done=weekTasks.filter(r=>r.fields.Status==='Done').length;
+  document.getElementById('week-done').textContent=done;
+
+  // Update engine count
+  const group=el.closest('.engine-group');
+  if(group){
+    const gDone=group.querySelectorAll('.task-row.done').length;
+    const gTotal=group.querySelectorAll('.task-row').length;
+    const countEl=group.querySelector('.engine-group-count');
+    if(countEl) countEl.textContent=gDone+'/'+gTotal+' done';
+  }
+
+  updateProgress();
+  await atUpdate('Tasks',id,{Status:newStatus});
+}
+
+function updateProgress(){
+  if(!allTasks.length) return;
+  const done=allTasks.filter(r=>r.fields.Status==='Done').length;
+  const pct=Math.round(done/allTasks.length*100);
+  document.getElementById('sidebar-prog').style.width=pct+'%';
+  document.getElementById('sidebar-pct').textContent=pct+'% complete';
+}
+
+// Pipeline
+const statusCycle=['Prospect','Contacted','Warm','Closed'];
+
+async function loadPipeline(){
+  document.getElementById('pipeline-container').innerHTML='<div class="loading-state"><span class="spin">⟳</span> Loading...</div>';
+  const records=await atFetch('B2B Pipeline');
+  if(!records.length){ document.getElementById('pipeline-container').innerHTML='<div class="loading-state">No leads found. Add them in Airtable.</div>'; return; }
+
+  let html=`<table class="pipeline-table"><thead><tr>
+    <th>Company</th><th>Category</th><th>Deal Size</th><th>Status</th><th>Priority</th><th>Next Action</th>
+  </tr></thead><tbody>`;
+
+  records.forEach(r=>{
+    const f=r.fields;
+    const sc='status-'+(f.Status||'Prospect').toLowerCase();
+    const pri=(f.Priority||'P3').replace('P','').toLowerCase();
+    html+=`<tr>
+      <td><span class="company-name">${f.Company||'—'}</span><span style="font-size:10px">${f.Notes||''}</span></td>
+      <td>${f.Category||'—'}</td>
+      <td><span class="deal-size">${f['Deal Size']||'—'}</span></td>
+      <td><span class="status-badge ${sc}" onclick="cycleStatus('${r.id}',this)">${f.Status||'Prospect'}</span></td>
+      <td><span class="priority-badge p${pri}">${f.Priority||'—'}</span></td>
+      <td style="font-size:10px">${f['Next Action']||'—'}</td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  html+='<div style="font-size:10px;color:var(--muted);margin-top:8px;">💡 Click any status badge to cycle: Prospect → Contacted → Warm → Closed</div>';
+  document.getElementById('pipeline-container').innerHTML=html;
+}
+
+async function cycleStatus(id, el){
+  const cur=el.textContent.trim();
+  const idx=statusCycle.indexOf(cur);
+  const next=statusCycle[(idx+1)%statusCycle.length];
+  el.textContent=next;
+  el.className='status-badge status-'+next.toLowerCase();
+  await atUpdate('B2B Pipeline',id,{Status:next});
+}
+
+// Metrics
+async function loadMetrics(){
+  document.getElementById('metrics-container').innerHTML='<div class="loading-state"><span class="spin">⟳</span> Loading...</div>';
+  const records=await atFetch('Revenue Metrics');
+  if(!records.length){ document.getElementById('metrics-container').innerHTML='<div class="loading-state">No metrics found. Add them in Airtable Revenue Metrics table.</div>'; return; }
+
+  const scMap={'On Track':'ms-track','At Risk':'ms-risk','Behind':'ms-behind','Achieved':'ms-achieved'};
+  const colMap={'On Track':'var(--green)','At Risk':'var(--gold)','Behind':'var(--rust)','Achieved':'var(--sage)'};
+
+  let html='<div class="metrics-grid">';
+  records.forEach(r=>{
+    const f=r.fields;
+    const sc=scMap[f.Status]||'ms-risk';
+    const col=colMap[f.Status]||'var(--gold)';
+    html+=`<div class="metric-card">
+      <div class="metric-name">${f.Metric||'—'}</div>
+      <div class="metric-current" style="color:${col}">${f['Current Value']||'—'}</div>
+      <div class="metric-target">Target: ${f.Target||'—'}</div>
+      <div class="metric-status ${sc}">${f.Status||'—'}</div>
+    </div>`;
+  });
+  html+='</div>';
+  document.getElementById('metrics-container').innerHTML=html;
+}
+
+// Init
+async function initApp(){
+  if(!getToken()){ showSetup(); return; }
+  allTasks=await atFetch('Tasks');
+  updateProgress();
+}
+
+initApp();
+</script>
 </body>
 </html>
