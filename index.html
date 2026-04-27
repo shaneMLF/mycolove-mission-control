@@ -151,6 +151,11 @@
   .ms-risk{border-color:var(--gold);color:var(--gold);}
   .ms-behind{border-color:var(--rust);color:var(--rust);}
   .ms-achieved{border-color:var(--sage);color:var(--sage);}
+  .metric-mom{font-size:10px;color:var(--dim);margin-top:2px;}
+  .metric-updated{font-size:9px;color:var(--muted);margin-top:6px;}
+  .metric-flag{font-size:9px;padding:4px 8px;margin-top:8px;border-radius:2px;}
+  .flag-red{background:rgba(201,107,58,0.12);color:var(--rust);border:1px solid rgba(201,107,58,0.3);}
+  .flag-green{background:rgba(109,184,107,0.1);color:var(--green);border:1px solid rgba(109,184,107,0.25);}
 
   /* Calendar */
   .cal-grid{display:grid;grid-template-columns:80px repeat(5,1fr);gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:24px;}
@@ -596,19 +601,96 @@ async function loadMetrics(){
   const scMap={'On Track':'ms-track','At Risk':'ms-risk','Behind':'ms-behind','Achieved':'ms-achieved'};
   const colMap={'On Track':'var(--green)','At Risk':'var(--gold)','Behind':'var(--rust)','Achieved':'var(--sage)'};
 
-  let html='<div class="metrics-grid">';
+  // Group by Category
+  const catOrder=['Revenue','Email / Klaviyo','Subscription Health','Orders / Conversion','B2B / Pipeline'];
+  const catIcons={'Revenue':'💰','Email / Klaviyo':'📧','Subscription Health':'🔄','Orders / Conversion':'🛒','B2B / Pipeline':'🤝'};
+  const groups={};
   records.forEach(r=>{
     const f=r.fields;
-    const sc=scMap[f.Status]||'ms-risk';
-    const col=colMap[f.Status]||'var(--gold)';
-    html+=`<div class="metric-card">
-      <div class="metric-name">${f.Metric||'—'}</div>
-      <div class="metric-current" style="color:${col}">${f['Current Value']||'—'}</div>
-      <div class="metric-target">Target: ${f.Target||'—'}</div>
-      <div class="metric-status ${sc}">${f.Status||'—'}</div>
-    </div>`;
+    const cat=f.Category||'Other';
+    if(!groups[cat]) groups[cat]=[];
+    groups[cat].push(r);
   });
-  html+='</div>';
+
+  let html='';
+  catOrder.forEach(cat=>{
+    const recs=groups[cat];
+    if(!recs||!recs.length) return;
+    html+=`<div class="sec">${catIcons[cat]||'📋'} ${cat}</div>`;
+    html+=`<div class="metrics-grid">`;
+    recs.forEach(r=>{
+      const f=r.fields;
+      const name=f.Name||f.Metric||'—';
+      const val=f['Current Value']||'—';
+      const target=f.Target||'';
+      const mom=f['MoM Change']||'';
+      const status=f.Status||'—';
+      const lastUpdated=f['Last Updated']||'';
+
+      // Determine color: use status-based default, then apply metric-specific overrides
+      let col=colMap[status]||'var(--gold)';
+      let sc=scMap[status]||'ms-risk';
+      let flag='';
+
+      // Click Rate: flag red if below 1%
+      if(name==='Campaign Click Rate'){
+        const pct=parseFloat(val);
+        if(!isNaN(pct)&&pct<1){
+          col='var(--rust)';
+          sc='ms-behind';
+          flag='<div class="metric-flag flag-red">Below 1% — needs attention</div>';
+        } else if(!isNaN(pct)&&pct>=2){
+          col='var(--green)';
+          sc='ms-track';
+        }
+      }
+      // Open Rate: >35% green, <20% red
+      if(name==='Campaign Open Rate'){
+        const pct=parseFloat(val);
+        if(!isNaN(pct)&&pct>=35){
+          col='var(--green)';
+          sc='ms-track';
+          flag='<div class="metric-flag flag-green">Healthy open rate</div>';
+        } else if(!isNaN(pct)&&pct<20){
+          col='var(--rust)';
+          sc='ms-behind';
+          flag='<div class="metric-flag flag-red">Below 20% — deliverability risk</div>';
+        }
+      }
+
+      html+=`<div class="metric-card">
+        <div class="metric-name">${name}</div>
+        <div class="metric-current" style="color:${col}">${val}</div>`;
+      if(target) html+=`<div class="metric-target">Target: ${target}</div>`;
+      if(mom&&mom!=='—') html+=`<div class="metric-mom">${mom}</div>`;
+      html+=`<div class="metric-status ${sc}">${status}</div>`;
+      html+=flag;
+      if(lastUpdated) html+=`<div class="metric-updated">Updated ${lastUpdated}</div>`;
+      html+=`</div>`;
+    });
+    html+=`</div>`;
+  });
+
+  // Render any uncategorized metrics
+  Object.keys(groups).forEach(cat=>{
+    if(catOrder.includes(cat)) return;
+    const recs=groups[cat];
+    if(!recs||!recs.length) return;
+    html+=`<div class="sec">${cat}</div><div class="metrics-grid">`;
+    recs.forEach(r=>{
+      const f=r.fields;
+      const sc=scMap[f.Status]||'ms-risk';
+      const col=colMap[f.Status]||'var(--gold)';
+      html+=`<div class="metric-card">
+        <div class="metric-name">${f.Name||f.Metric||'—'}</div>
+        <div class="metric-current" style="color:${col}">${f['Current Value']||'—'}</div>
+        <div class="metric-target">Target: ${f.Target||'—'}</div>
+        <div class="metric-status ${sc}">${f.Status||'—'}</div>
+      </div>`;
+    });
+    html+=`</div>`;
+  });
+
   document.getElementById('metrics-container').innerHTML=html;
 }
 
